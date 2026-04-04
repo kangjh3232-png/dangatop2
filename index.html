@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#111110">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="단가표">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>새한패키지 단가표</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#f5f4f0;
+  --card:#ffffff;
+  --txt:#111110;
+  --txt2:#6b6960;
+  --txt3:#b0aea8;
+  --bdr:#e8e6e0;
+  --bdr2:#d4d2cc;
+  --head:#111110;
+  --head2:#1e1e1c;
+  --accent:#2563eb;
+  --accent-bg:#eff4ff;
+  --accent-bdr:#bfcfff;
+  --green:#15803d;
+  --green-bg:#f0fdf4;
+  --amber:#b45309;
+  --amber-bg:#fffbeb;
+  --red:#dc2626;
+  --red-bg:#fef2f2;
+  --purple:#7c3aed;
+  --purple-bg:#f5f3ff;
+  --purple-bdr:#c4b5fd;
+  --rad-sm:8px;
+  --rad:12px;
+  --rad-lg:16px;
+  --rad-xl:20px;
+}
+html,body{
+  height:100%;
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo',sans-serif;
+  font-size:14px;
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+}
+.app{display:flex;flex-direction:column;height:100dvh;max-width:640px;margin:0 auto;overflow:hidden}
+
+/* ── 헤더 ── */
+.header{
+  flex-shrink:0;
+  background:var(--head);
+  color:#fff;
+  padding:max(16px,env(safe-area-inset-top)) 18px 0;
+}
+.header-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:12px;
+}
+.brand{}
+.brand-name{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.38);
+  margin-bottom:3px;
+}
+.header-title{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:-.6px;
+  line-height:1;
+  color:#fff;
+}
+.header-sub{
+  font-size:10px;
+  color:rgba(255,255,255,.35);
+  margin-top:5px;
+  letter-spacing:.1px;
+}
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+  padding-top:2px;
+}
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;height:36px;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:50%;
+  font-size:15px;
+  cursor:pointer;
+  position:relative;
+  flex-shrink:0;
+  transition:background .15s;
+}
+.icon-btn:active{background:rgba(255,255,255,.18)}
+.red-dot{
+  position:absolute;top:1px;right:1px;
+  width:8px;height:8px;
+  background:var(--red);
+  border-radius:50%;
+  border:1.5px solid var(--head);
+  display:none;
+}
+.red-dot.on{display:block}
+.bh-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 14px;
+  background:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.9);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+  white-space:nowrap;
+  letter-spacing:-.1px;
+  transition:background .15s;
+}
+.bh-btn:active{background:rgba(255,255,255,.2)}
+.bh-dot{
+  width:6px;height:6px;
+  background:#4ade80;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+/* 원재료 토글 */
+.mat-toggle{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:8px 14px;
+  background:rgba(255,255,255,.05);
+  border:none;border-top:1px solid rgba(255,255,255,.07);
+  color:rgba(255,255,255,.4);
+  font-size:11px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+  letter-spacing:.3px;
+  transition:background .15s;
+}
+.mat-toggle:active{background:rgba(255,255,255,.1)}
+.mat-arrow{display:inline-block;transition:transform .25s;font-size:9px}
+.mat-toggle.open .mat-arrow{transform:rotate(180deg)}
+
+/* 원재료 단가 패널 */
+.mat-panel{
+  flex-shrink:0;
+  background:#1a1a18;
+  overflow:hidden;max-height:0;
+  transition:max-height .3s ease;
+}
+.mat-panel.open{max-height:220px}
+.mat-inner{padding:14px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.mat-row{display:flex;gap:8px;flex-wrap:wrap}
+.mat-item{display:flex;align-items:center;gap:8px;flex:1;min-width:110px}
+.mat-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.4);white-space:nowrap;min-width:48px;letter-spacing:.3px}
+.mat-input{
+  flex:1;padding:7px 10px;
+  font-size:13px;font-weight:700;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--rad-sm);
+  color:#fff;text-align:right;
+  outline:none;font-family:inherit;
+  width:70px;min-width:0;
+  transition:border-color .15s,background .15s;
+}
+.mat-input:focus{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)}
+.mat-unit{font-size:10px;color:rgba(255,255,255,.25);white-space:nowrap}
+
+/* ── 검색 영역 ── */
+.search-area{
+  flex-shrink:0;
+  padding:12px 14px 10px;
+  background:var(--bg);
+  border-bottom:1px solid var(--bdr);
+}
+.search-row{display:flex;gap:8px;margin-bottom:9px}
+.search-wrap{
+  flex:1;position:relative;
+  display:flex;align-items:center;
+}
+.search-ico{
+  position:absolute;left:12px;
+  font-size:14px;color:var(--txt3);
+  pointer-events:none;
+}
+.search-input{
+  width:100%;
+  padding:10px 14px 10px 36px;
+  font-size:14px;
+  border:1.5px solid var(--bdr2);
+  border-radius:var(--rad);
+  background:var(--card);
+  color:var(--txt);
+  outline:none;
+  font-family:inherit;
+  -webkit-appearance:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.search-input::placeholder{color:var(--txt3)}
+.sort-sel{
+  padding:10px 10px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--bdr2);
+  border-radius:var(--rad);
+  background:var(--card);color:var(--txt2);
+  outline:none;font-family:inherit;
+  -webkit-appearance:none;min-width:72px;
+  cursor:pointer;
+}
+.tag-scroll{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.tag-scroll::-webkit-scrollbar{display:none}
+.tag{
+  flex-shrink:0;padding:5px 13px;
+  border-radius:20px;font-size:11px;font-weight:600;
+  cursor:pointer;
+  border:1.5px solid var(--bdr2);
+  color:var(--txt2);background:var(--card);
+  user-select:none;white-space:nowrap;
+  transition:all .12s;
+  letter-spacing:-.1px;
+}
+.tag:active{opacity:.7}
+.tag.active{background:var(--txt);color:#fff;border-color:var(--txt)}
+
+/* ── 통계 바 ── */
+.stat-bar{
+  flex-shrink:0;display:flex;
+  background:var(--card);
+  border-bottom:1px solid var(--bdr);
+}
+.stat-item{
+  flex:1;padding:8px 6px;text-align:center;
+  border-right:1px solid var(--bdr);
+}
+.stat-item:last-child{border-right:none}
+.stat-lbl{font-size:9px;font-weight:600;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase}
+.stat-val{font-size:13px;font-weight:800;margin-top:2px;letter-spacing:-.3px;color:var(--txt)}
+
+/* ── 목록 ── */
+.list-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+
+.item-card{
+  display:flex;align-items:center;
+  padding:13px 16px;
+  border-bottom:1px solid var(--bdr);
+  background:var(--card);
+  gap:11px;cursor:pointer;
+  transition:background .1s;
+  position:relative;
+}
+.item-card:active{background:#f8f7f3}
+.item-card.modified::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--amber);border-radius:0 2px 2px 0;
+}
+.item-no{
+  font-size:10px;font-weight:700;
+  color:var(--txt3);
+  min-width:22px;text-align:right;flex-shrink:0;
+  font-variant-numeric:tabular-nums;
+}
+.item-body{flex:1;min-width:0}
+.item-name{
+  font-size:14px;font-weight:700;color:var(--txt);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:-.2px;
+}
+.item-meta{display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap}
+.item-cost{
+  font-size:11px;color:var(--txt3);font-weight:500;
+}
+.badge{
+  display:inline-flex;align-items:center;
+  padding:1px 7px;border-radius:20px;
+  font-size:10px;font-weight:700;
+  letter-spacing:.1px;flex-shrink:0;
+}
+.b-pet{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-bdr)}
+.b-petg{background:var(--amber-bg);color:var(--amber);border:1px solid #fcd34d}
+.b-ps{background:#f8f8f7;color:var(--txt2);border:1px solid var(--bdr2)}
+.b-psg{background:var(--amber-bg);color:var(--amber);border:1px solid #fcd34d}
+.b-pp{background:var(--green-bg);color:var(--green);border:1px solid #86efac}
+.b-etc{background:var(--bg);color:var(--txt3);border:1px solid var(--bdr)}
+.item-prices{
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;
+}
+.price-gen{
+  font-size:15px;font-weight:800;color:var(--accent);
+  letter-spacing:-.4px;font-variant-numeric:tabular-nums;
+}
+.price-dis{
+  font-size:11px;font-weight:600;color:var(--green);
+  font-variant-numeric:tabular-nums;
+}
+.no-result{
+  text-align:center;padding:70px 24px;color:var(--txt3);
+  font-size:15px;line-height:1.7;
+}
+
+/* ── + FAB ── */
+.add-fab{
+  position:fixed;
+  bottom:max(24px,env(safe-area-inset-bottom));
+  right:20px;
+  width:54px;height:54px;
+  background:var(--txt);color:#fff;
+  border:none;border-radius:50%;
+  font-size:26px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+  z-index:50;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;
+}
+.add-fab:active{transform:scale(.92);box-shadow:0 2px 10px rgba(0,0,0,.2)}
+
+/* ── 공통 오버레이 ── */
+.ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:100;align-items:flex-end;
+  backdrop-filter:blur(2px);
+}
+.ov.open{display:flex}
+.sheet{
+  background:var(--card);
+  border-radius:var(--rad-xl) var(--rad-xl) 0 0;
+  width:100%;max-width:640px;
+  margin:0 auto;
+  padding:0 0 max(24px,env(safe-area-inset-bottom));
+  animation:up .28s cubic-bezier(.32,.72,0,1);
+}
+.sheet.scroll{max-height:88dvh;overflow-y:auto}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.drag-bar{
+  width:38px;height:4px;
+  background:var(--bdr2);border-radius:2px;
+  margin:12px auto 0;
+}
+.sheet-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px 12px;
+  border-bottom:1px solid var(--bdr);
+}
+.sheet-title{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.sheet-btn{
+  padding:8px 18px;
+  background:var(--txt);color:#fff;
+  border:none;border-radius:20px;
+  font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  letter-spacing:-.1px;
+  transition:opacity .15s;
+}
+.sheet-btn:active{opacity:.7}
+.sheet-btn.ghost{background:var(--bg);color:var(--txt2);border:1.5px solid var(--bdr2)}
+
+/* ── 상세 패널 ── */
+.d-head{padding:16px 20px 12px;border-bottom:1px solid var(--bdr)}
+.d-name{font-size:18px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
+.d-meta{display:flex;align-items:center;gap:8px;margin-top:6px}
+.d-edit-btn{
+  font-size:11px;font-weight:700;
+  color:var(--purple);background:var(--purple-bg);
+  border:1px solid var(--purple-bdr);
+  padding:3px 11px;border-radius:20px;
+  cursor:pointer;font-family:inherit;
+  transition:opacity .15s;
+}
+.d-edit-btn:active{opacity:.7}
+.d-section{
+  padding:9px 20px 5px;
+  font-size:10px;font-weight:700;
+  color:var(--txt3);
+  background:var(--bg);
+  letter-spacing:.8px;text-transform:uppercase;
+  border-bottom:1px solid var(--bdr);
+}
+.d-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 20px;border-bottom:1px solid var(--bdr);
+}
+.d-row:last-child{border-bottom:none}
+.d-key{font-size:13px;color:var(--txt2);font-weight:500}
+.d-val{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.d-val.v-accent{color:var(--accent);font-size:17px}
+.d-val.v-green{color:var(--green);font-size:17px}
+.d-val.v-muted{color:var(--txt2);font-weight:600}
+.d-val.v-amber{color:var(--amber)}
+.d-close{
+  width:calc(100% - 32px);margin:12px 16px 0;
+  padding:15px;
+  background:var(--bg);border:1.5px solid var(--bdr2);
+  border-radius:var(--rad);
+  font-size:15px;font-weight:700;color:var(--txt2);
+  cursor:pointer;font-family:inherit;
+  transition:background .15s;
+}
+.d-close:active{background:var(--bdr)}
+
+/* ── 수정 폼 ── */
+.ef{padding:16px 20px}
+.fg{margin-bottom:14px}
+.fg label{
+  display:block;font-size:10px;font-weight:700;
+  color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:5px;
+}
+.fi{
+  width:100%;padding:11px 14px;font-size:14px;font-weight:500;
+  border:1.5px solid var(--bdr2);border-radius:var(--rad);
+  background:var(--card);color:var(--txt);
+  outline:none;font-family:inherit;-webkit-appearance:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+.fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.del-btn{
+  width:100%;margin-top:4px;padding:13px;
+  background:var(--red-bg);color:var(--red);
+  border:1.5px solid rgba(220,38,38,.2);
+  border-radius:var(--rad);font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:opacity .15s;
+}
+.del-btn:active{opacity:.7}
+
+/* ── 메모 ── */
+.memo-date-bar{
+  padding:6px 20px 0;
+  font-size:11px;color:var(--txt3);font-weight:500;
+}
+.memo-ta{
+  width:100%;min-height:200px;
+  padding:14px 20px;
+  font-size:15px;border:none;outline:none;
+  resize:none;font-family:inherit;
+  color:var(--txt);line-height:1.7;
+}
+.memo-ta::placeholder{color:var(--txt3)}
+.memo-ok{
+  font-size:12px;font-weight:600;color:var(--green);
+  padding:4px 20px 10px;display:none;
+}
+
+/* ── 내보내기 ── */
+.export-info{
+  font-size:12px;color:var(--txt2);
+  padding:10px 20px 6px;line-height:1.5;
+}
+.export-ta{
+  width:100%;height:220px;
+  padding:13px 20px;font-size:11px;
+  border:none;outline:none;resize:none;
+  font-family:'Courier New',monospace;
+  color:var(--txt);line-height:1.6;
+  background:var(--bg);
+}
+.copy-btn{
+  display:block;width:calc(100% - 32px);
+  margin:0 16px 8px;padding:15px;
+  background:var(--txt);color:#fff;
+  border:none;border-radius:var(--rad);
+  font-size:15px;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  transition:opacity .15s;
+}
+.copy-btn:active{opacity:.7}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── 헤더 ── -->
+  <div class="header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-name">Saehen Package</div>
+        <div class="header-title">단가표</div>
+        <div class="header-sub" id="mat-summary">PET 2,100 · PS 2,500 · PET금 4,000원/kg</div>
+      </div>
+      <div class="header-actions">
+        <div style="position:relative;display:inline-flex">
+          <button class="icon-btn" onclick="openMemo()" title="메모">📝</button>
+          <span class="red-dot" id="memo-dot"></span>
+        </div>
+        <button class="icon-btn" onclick="openExport()" title="내보내기">📤</button>
+        <a class="bh-btn" href="boxhero://" onclick="openBH(event)">
+          <span class="bh-dot"></span>재고확인
+        </a>
+      </div>
+    </div>
+    <button class="mat-toggle" id="mat-toggle" onclick="toggleMat()">
+      ⚙ 원재료 단가 설정&nbsp;&nbsp;<span class="mat-arrow">▾</span>
+    </button>
+  </div>
+
+  <!-- ── 원재료 단가 패널 ── -->
+  <div class="mat-panel" id="mat-panel">
+    <div class="mat-inner">
+      <div class="mat-row">
+        <div class="mat-item"><span class="mat-label">PET</span><input class="mat-input" id="mp-pet" type="number" value="2100" min="0" step="10" oninput="updatePrices()"><span class="mat-unit">원/kg</span></div>
+        <div class="mat-item"><span class="mat-label">PET금색</span><input class="mat-input" id="mp-petg" type="number" value="4000" min="0" step="10" oninput="updatePrices()"><span class="mat-unit">원/kg</span></div>
+      </div>
+      <div class="mat-row">
+        <div class="mat-item"><span class="mat-label">PS</span><input class="mat-input" id="mp-ps" type="number" value="2500" min="0" step="10" oninput="updatePrices()"><span class="mat-unit">원/kg</span></div>
+        <div class="mat-item"><span class="mat-label">PS금색</span><input class="mat-input" id="mp-psg" type="number" value="4300" min="0" step="10" oninput="updatePrices()"><span class="mat-unit">원/kg</span></div>
+        <div class="mat-item"><span class="mat-label">PP</span><input class="mat-input" id="mp-pp" type="number" value="2600" min="0" step="10" oninput="updatePrices()"><span class="mat-unit">원/kg</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 검색 ── -->
+  <div class="search-area">
+    <div class="search-row">
+      <div class="search-wrap">
+        <span class="search-ico">🔍</span>
+        <input class="search-input" type="search" id="search" placeholder="품명 검색…" autocomplete="off">
+      </div>
+      <select class="sort-sel" id="sort">
+        <option value="">정렬</option>
+        <option value="no">번호</option>
+        <option value="name">품명</option>
+        <option value="gasc">일반가↑</option>
+        <option value="gdesc">일반가↓</option>
+        <option value="dasc">유통가↑</option>
+        <option value="ddesc">유통가↓</option>
+      </select>
+    </div>
+    <div class="tag-scroll" id="tags"></div>
+  </div>
+
+  <!-- ── 통계 바 ── -->
+  <div class="stat-bar">
+    <div class="stat-item"><div class="stat-lbl">전체</div><div class="stat-val" id="s-tot">0</div></div>
+    <div class="stat-item"><div class="stat-lbl">결과</div><div class="stat-val" id="s-fil">0</div></div>
+    <div class="stat-item"><div class="stat-lbl">최저가</div><div class="stat-val" id="s-min">—</div></div>
+    <div class="stat-item"><div class="stat-lbl">최고가</div><div class="stat-val" id="s-max">—</div></div>
+  </div>
+
+  <!-- ── 목록 ── -->
+  <div class="list-wrap">
+    <div id="list"></div>
+    <div id="no-res" class="no-result" style="display:none">
+      😶 검색 결과가 없어요<br><span style="font-size:13px">다른 키워드로 검색해보세요</span>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="add-fab" onclick="openEdit(null)">+</button>
+
+<!-- 상세 -->
+<div class="ov" id="ov-detail" onclick="if(event.target===this)closeDetail()">
+  <div class="sheet scroll">
+    <div class="drag-bar"></div>
+    <div class="d-head">
+      <div class="d-name" id="d-nm"></div>
+      <div class="d-meta" id="d-bd"></div>
+    </div>
+    <div id="d-rows"></div>
+    <button class="d-close" onclick="closeDetail()">닫기</button>
+  </div>
+</div>
+
+<!-- 수정/추가 -->
+<div class="ov" id="ov-edit" onclick="if(event.target===this)closeEdit()">
+  <div class="sheet scroll">
+    <div class="drag-bar"></div>
+    <div class="sheet-head">
+      <span class="sheet-title" id="edit-title">품목 추가</span>
+      <button class="sheet-btn" onclick="saveEdit()">저장</button>
+    </div>
+    <div class="ef">
+      <div class="fg"><label>품명 *</label><input class="fi" id="ef-name" placeholder="예) 화과자4구 상"></div>
+      <div class="fg-row">
+        <div class="fg"><label>소재</label>
+          <select class="fi" id="ef-mat">
+            <option value="PET">PET</option>
+            <option value="PET금색">PET금색</option>
+            <option value="PS">PS</option>
+            <option value="PS금색">PS금색</option>
+            <option value="PP">PP</option>
+            <option value="사출">사출</option>
+          </select>
+        </div>
+        <div class="fg"><label>몰드홈 수량</label><input class="fi" id="ef-mold" type="number" min="0" placeholder="18"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>두께 (mm)</label><input class="fi" id="ef-thick" type="number" step="0.01" placeholder="0.43"></div>
+        <div class="fg"><label>이송 (mm)</label><input class="fi" id="ef-feed" type="number" placeholder="540"></div>
+      </div>
+      <div class="fg"><label>세로 (mm)</label><input class="fi" id="ef-width" type="number" placeholder="266"></div>
+      <div class="fg-row">
+        <div class="fg"><label>일반단가 (원)</label><input class="fi" id="ef-gen" type="number" placeholder="0"></div>
+        <div class="fg"><label>유통단가 (원)</label><input class="fi" id="ef-dist" type="number" placeholder="0"></div>
+      </div>
+      <button class="del-btn" id="ef-del" onclick="deleteItem()" style="display:none">🗑 이 품목 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메모 -->
+<div class="ov" id="ov-memo" onclick="if(event.target===this)closeMemo()">
+  <div class="sheet">
+    <div class="drag-bar"></div>
+    <div class="sheet-head">
+      <span class="sheet-title">📝 메모</span>
+      <button class="sheet-btn" onclick="saveMemo()">저장</button>
+    </div>
+    <div class="memo-date-bar" id="memo-date"></div>
+    <textarea class="memo-ta" id="memo-ta" placeholder="거래처 연락처, 특이사항, 할인 조건 등 자유롭게 메모하세요…"></textarea>
+    <div class="memo-ok" id="memo-ok">✓ 저장됐습니다</div>
+  </div>
+</div>
+
+<!-- 내보내기 -->
+<div class="ov" id="ov-export" onclick="if(event.target===this)closeExport()">
+  <div class="sheet">
+    <div class="drag-bar"></div>
+    <div class="sheet-head">
+      <span class="sheet-title">📤 수정사항 내보내기</span>
+      <button class="sheet-btn ghost" onclick="closeExport()">닫기</button>
+    </div>
+    <div class="export-info" id="export-info"></div>
+    <textarea class="export-ta" id="export-ta" readonly></textarea>
+    <button class="copy-btn" onclick="copyExport()">📋 클립보드에 복사</button>
+  </div>
+</div>
+
+<script>
+const BASE_D=[
+[1,"화과자1구 상","PET",0.43,540,266,18,36.0,30.0],
+[2,"화과자1구 하 PET 흑색","PET",0.34,510,252,18,34.0,26.0],
+[3,"화과자1구 하 PET 금색","PET금색",0.36,510,252,18,45.0,34.5],
+[4,"화과자1구 하 PET 투명","PET",0.34,510,252,18,34.0,26.0],
+[5,"화과자2구 상","PET",0.47,590,305,12,65.0,60.0],
+[6,"화과자2구 하 PET 흑색","PET",0.36,450,305,10,60.0,53.0],
+[7,"화과자2구 하 PET 금색","PET금색",0.36,440,305,10,75.0,70.0],
+[8,"화과자4구 상","PET",0.43,660,315,7,110.0,97.75],
+[9,"화과자4구 하","PS",0.43,695,300,9,90.0,90.0],
+[10,"화과자10구 상","PET",0.47,590,350,4,220.0,195.5],
+[11,"화과자10구 하 PET 흑색","PET",0.48,585,350,4,220.0,195.5],
+[12,"화과자16구 상","PET",0.47,590,300,2,360.0,310.5],
+[13,"화과자16구 하 PET 흑색","PET",0.48,585,300,2,360.0,310.5],
+[14,"화과자20구 상","PET",0.47,590,385,2,390.0,345.0],
+[15,"화과자20구 하 PET 흑색","PET",0.48,585,385,2,390.0,345.0],
+[16,"SH-180(저,상)","PET",0.43,545,335,15,50.0,50.0],
+[17,"SH-180 하 PET 흑색","PET",0.36,450,320,16,60.0,51.75],
+[18,"SH-180 상","PET",0.5,545,335,15,60.0,51.75],
+[19,"SH-180 상 고","PET",0.6,545,335,15,70.0,62.0],
+[20,"SH-180 하 PET 백색","PET",0.42,450,320,18,60.0,51.75],
+[21,"SH-180 하 PET 투명","PET",0.42,450,320,18,60.0,51.75],
+[22,"SH-190 상","PET",0.4,510,385,12,65.0,55.2],
+[23,"SH-190 하 PET 흑색","PET",0.36,510,385,12,65.0,59.8],
+[24,"SH-200 상","PET",0.5,450,420,9,90.0,90.0],
+[25,"SH-200 상 고","PET",0.84,360,360,4,160.0,100.0],
+[26,"SH-200(하,투명)","PET",0.36,450,435,9,90.0,90.0],
+[27,"SH-200(하,금색)","PET금색",0.38,460,435,9,110.0,110.0],
+[28,"SH-300 상","PET",0.4,510,310,6,110.0,100.0],
+[29,"SH-300 하","PET",0.8,520,340,6,145.0,135.0],
+[30,"SH-01(사출컵) 상","PET",0.28,550,340,12,55.0,55.0],
+[31,"SH-01(사출컵) 하","PET",0,0,0,0,200.0,149.5],
+[32,"SH-01(사출컵) 하 PP","PP",0,0,0,0,200.0,149.5],
+[33,"SH-01(사출컵) 하 PS","PS",0,0,0,0,200.0,149.5],
+[34,"SH-02 상","PET",0.38,620,380,15,45.0,40.0],
+[35,"SH-02 하","PET",0.5,600,370,15,55.0,50.0],
+[36,"SH-B1 상","PET",0.43,540,334,15,45.0,44.0],
+[37,"SH-B1 하 PS 흑색","PS",0.45,610,320,15,50.0,46.0],
+[38,"SH-B1 하 PET 흑색","PET",0.34,510,320,12,50.0,46.0],
+[39,"SH-B1 하 PET 금색","PET금색",0.38,520,320,12,65.0,58.0],
+[40,"SH-B4 상","PET",0.47,590,345,6,120.0,115.0],
+[41,"SH-B4 하","PS",0.45,680,335,8,100.0,92.0],
+[42,"SH-B7 상 PP","PP",0.7,625,425,6,155.0,145.0],
+[43,"SH-B7 하 PP","PP",0.6,660,445,6,165.0,155.0],
+[44,"SH-B9 상","PET",0.43,760,500,4,240.0,218.5],
+[45,"SH-B9 하","PET",0.43,760,500,4,240.0,230.0],
+[46,"SH-B9 하 PP","PP",0.61,525,400,2,350.0,300.0],
+[47,"SH-B100 상","PET",0.6,575,410,1,850.0,850.0],
+[48,"SH-B100 하","PET",1.1,550,420,1,1200.0,1200.0],
+[49,"SH-B100 하 투명","PET",1.1,550,420,1,1200.0,1200.0],
+[50,"SH-C1(저) 하 PET 금색","PET금색",0.38,560,380,15,70.0,70.0],
+[51,"SH-C1(고) 하 PET 금색","PET금색",0.38,560,380,15,70.0,57.5],
+[52,"SH-C1(저) 상        압공","PET",0.43,400,519,12,70.0,63.25],
+[53,"SH-C1(고) 상","PET",0.55,525,370,12,90.0,80.5],
+[54,"SH-C2 상 저","PET",0.38,375,450,9,100.0,90.0],
+[55,"SH-C2 상","PET",0.47,590,310,8,110.0,100.0],
+[56,"SH-C2 상 고","PET",0.6,430,520,9,120.0,110.0],
+[57,"SH-C2 하 PET 금색","PET금색",0.38,560,310,8,130.0,115.0],
+[58,"SH-C2 하 PET 투명","PET",0.4,560,310,8,100.0,90.0],
+[59,"SH-C2 하 PET 흑색","PET",0.4,560,310,8,100.0,90.0],
+[60,"SH-C-1 하 PET 투명","PET",0.4,560,310,8,100.0,90.0],
+[61,"SH-C3(저,상)","PET",0.47,590,360,15,60.0,57.5],
+[62,"SH-C3(고,상)","PET",0.55,610,412,15,80.0,69.0],
+[63,"SH-C3-1(고,상)","PET",0.6,520,395,15,55.0,50.0],
+[64,"SH-C3(하, 투명)","PS",0.36,550,345,15,70.0,70.0],
+[65,"SH-C3(하,백색)","PS",0.4,550,345,15,70.0,70.0],
+[66,"SH-C3(하,흑색)","PS",0.4,550,345,15,70.0,57.5],
+[67,"SH-C3 하 금색 PET","PET금색",0.4,550,345,15,80.0,80.0],
+[68,"SH-C3(저,상)","PET",0.47,590,360,15,60.0,57.5],
+[69,"SH-C4 상","PET",0.6,570,430,12,90.0,90.0],
+[70,"SH-C4 상 고","PET",0.8,520,355,6,145.0,140.0],
+[71,"SH-C4 하 투명","PET",0.36,510,385,12,90.0,90.0],
+[72,"SH-C4 하 흑","PET",0.36,510,385,12,90.0,90.0],
+[73,"SH-C4 하 금색원형","PET금색",0.38,520,275,8,110.0,92.0],
+[74,"SH-C5 상 고","PET",0.8,500,305,6,135.0,126.5],
+[75,"SH-C5 상 저","PET",0.55,540,400,12,70.0,65.0],
+[76,"SH-C5 하 금색합지","PET금색",0.38,520,275,8,110.0,85.0],
+[77,"SH-C5-1 하","PET",0.38,515,365,12,70.0,70.0],
+[78,"SH-C6","PET",0.6,320,440,6,150.0,150.0],
+[79,"SH-C7 상","PET",0.6,620,356,8,110.0,103.5],
+[80,"SH-C7 하","PET",0.4,620,356,8,90.0,90.0],
+[81,"SH-CC1 상","PET",0.6,580,305,2,400.0,350.0],
+[82,"SH-CC1 상 고","PET",0.6,580,305,2,400.0,368.0],
+[83,"SH-CC1 하","PET",0.45,635,305,2,350.0,350.0],
+[84,"SH-G1 상","PET",0.3,490,285,15,40.0,34.5],
+[85,"SH-G1 하","PET",0.45,490,290,15,45.0,40.0],
+[86,"SH-P1 상","PET",0.43,575,295,2,350.0,316.25],
+[87,"SH-P1 하","PET",0.43,575,295,2,350.0,316.25],
+[88,"SH-P2 상","PET",0.45,625,300,2,400.0,400.0],
+[89,"SH-P2 하","PET",0.45,620,325,2,400.0,400.0],
+[90,"SH-PT01 (상/하/포크 세트단가)","PET",0.38,430,477,12,212.0,203.0],
+[91,"SH-PT02 (상/하/포크 세트단가)","PET",0.38,430,480,12,240.0,225.0],
+[92,"SH-PT03 (상/하/포크 세트단가)","PET",0.38,430,470,8,257.0,240.0],
+[93,"SH-PT04 (상/하/포크 세트단가)","PET",0.38,430,420,6,280.0,275.0],
+[94,"SH-R1 상","PET",0.6,460,430,6,130.0,125.0],
+[95,"SH-R1 하","PET",0.36,450,385,6,110.0,100.0],
+[96,"SH-R1 하 (투명)","PET",0.36,450,385,6,110.0,100.0],
+[97,"SH-R02 상","PET",0.65,520,340,6,130.0,126.5],
+[98,"SH-R02 하 PET 흑색 / 백색","PET",0.4,640,325,8,90.0,80.5],
+[99,"SH-R02-1 하 PET 금색","PET금색",0.4,640,325,8,110.0,100.0],
+[100,"SH-R03 상","PET",0.6,490,450,8,110.0,100.0],
+[101,"SH-R03 상 (3구)","PET",0.6,490,450,8,110.0,100.0],
+[102,"SH-R03 하","PET",0.36,450,439,8,80.0,75.0],
+[103,"SH-R03 하 (투명)","PET",0.36,450,439,8,80.0,75.0],
+[104,"SH-R04 상 고","PET",0.58,510,365,10,75.0,71.0],
+[105,"SH-R04 상 저","PET",0.36,460,340,10,65.0,50.0],
+[106,"SH-R04(하,투명)","PET",0.4,460,345,10,65.0,64.0],
+[107,"SH-R04(하,금색)","PET금색",0.38,450,345,10,75.0,69.0],
+[108,"SH-R04-1 상 저","PET",0.36,460,300,10,65.0,50.0],
+[109,"SH-R04-1 하 금색","PET금색",0.38,460,300,10,75.0,60.0],
+[110,"SH-R05 저 상","PET",0.55,530,305,10,70.0,65.0],
+[111,"SH-R05 상","PET",0.55,530,305,10,70.0,65.0],
+[112,"SH-R05-1 상","PET",0.55,530,305,10,70.0,65.0],
+[113,"SH-R05-1 상 저","PET",0.43,540,305,10,65.0,60.0],
+[114,"SH-R05 하","PET금색",0.38,460,272,10,70.0,65.0],
+[115,"SH-R06 상","PET",0.6,490,365,8,100.0,90.0],
+[116,"SH-R06 하","PET",0.4,460,345,8,80.0,75.0],
+[117,"SH-R06 하 (투명)","PET",0.4,460,345,8,80.0,75.0],
+[118,"SH-R07 상","PET",0.6,500,470,6,135.0,120.0],
+[119,"SH-R07 하","PET",0.5,515,430,8,95.0,80.0],
+[120,"SH-R120             압공","PET",0.43,500,490,6,140.0,120.0],
+[121,"SH-R130","PET",0.43,500,490,6,140.0,120.0],
+[122,"SH-S1                압공","PET",0.46,495,540,4,210.0,207.0],
+[123,"SH-S2 상","PET",0.36,575,465,8,150.0,150.0],
+[124,"SH-S2 하 PET 금색","PET금색",0.68,430,470,8,200.0,200.0],
+[125,"SH-S2 하 PET 투명","PET",0.6,430,470,8,160.0,160.0],
+[126,"SH-S03 상","PET",0.36,550,350,10,70.0,69.0],
+[127,"SH-S03 상 (고)","PET",0.36,550,350,10,70.0,69.0],
+[128,"SH-S03 하 PET 투명","PET",0.43,550,350,10,90.0,69.0],
+[129,"SH-S03 하 PET 금색","PET금색",0.43,550,350,10,90.0,85.0],
+[130,"SH-S04               압공","PET",0.48,305,415,1,400.0,400.0],
+[131,"SH-S05 상","PET",0.36,550,327,10,70.0,60.0],
+[132,"SH-S05 하 PET 금색","PET금색",0.51,460,323,8,100.0,95.0],
+[133,"SH-S05 하 PET 투명","PET",0.45,475,323,8,80.0,75.0],
+[134,"SH-S06 상","PET",0.38,345,490,4,145.0,125.0],
+[135,"SH-S06 하","PET",0.48,345,490,4,155.0,135.0],
+[136,"SH-T1 상","PET",0.55,555,360,8,110.0,110.0],
+[137,"SH-T1(하,흑색)","PS",0.46,590,329,10,90.0,90.0],
+[138,"SH-T1(하,백색)","PS",0.46,590,329,10,90.0,90.0],
+[139,"SH-T1(하,투명)","PET",0.42,590,329,10,90.0,90.0],
+[140,"SH-T2 상 저","PET",0.6,395,434,8,85.0,75.0],
+[141,"SH-T2 상 고","PET",0.9,400,470,8,110.0,90.0],
+[142,"SH-T2 하 PS 백색 / 흑색","PS",0.49,405,390,8,75.0,65.0],
+[143,"SH-T2 하 PET 금색","PET금색",0.38,405,390,8,90.0,80.0],
+[144,"SH-T3 상","PET",0.6,490,328,8,80.0,75.0],
+[145,"SH-T3 하 PET 금색","PET금색",0.38,460,310,8,85.0,80.0],
+[146,"SH-T4 상 저","PET",0.6,430,430,8,120.0,110.0],
+[147,"SH-T4 상 고","PET",1.0,430,430,6,160.0,150.0],
+[148,"SH-T4 하 PET 금색","PET금색",0.4,460,420,8,100.0,90.0],
+[149,"SH-T5 상 고","PET",0.75,555,350,8,110.0,90.0],
+[150,"SH-T5 상 저","PET",0.65,555,350,8,100.0,80.0],
+[151,"SH-T5 하 PET 흑색","PET",0.4,550,360,8,80.0,70.0],
+[152,"SH-T5-1 하 PET 흑색","PET",0.4,550,360,8,80.0,70.0],
+[153,"SH-T6 PP","PP",0.58,570,450,15,60.0,55.0],
+[154,"SH-T6 PET 투명","PET",0.55,570,450,15,55.0,50.0],
+[155,"SH-M2","PET",0.5,430,530,6,130.0,100.0],
+[156,"마카롱3구 상","PET",0.43,490,410,10,75.0,69.0],
+[157,"마카롱3구 하","PET",0.43,490,410,10,75.0,69.0],
+[158,"마카롱5구 상","PET",0.45,580,300,6,110.0,109.25],
+[159,"마카롱5구 하","PET",0.45,580,300,6,110.0,109.25],
+[160,"마카롱8구","PET",0.45,580,405,2,400.0,350.0],
+[161,"뚱카롱3구           압공","PET",0.43,365,425,4,165.0,161.0],
+[162,"뚱카롱6구           압공","PET",0.43,365,425,2,330.0,300.0],
+[163,"뚱카롱5구           압공","PET",0.4,390,626,4,280.0,230.0],
+[164,"뚱카롱10구          압공","PET",0.4,390,626,2,500.0,400.0],
+[165,"마카롱 21구","PET",0.45,580,415,2,450.0,450.0],
+[166,"뚱카롱 24구","PET",0.45,705,475,2,450.0,425.5],
+[167,"뚱카롱 30구 1P","PET",0.5,635,428,1,850.0,685.0],
+[168,"뚱카롱 30구 2P","PET",0.5,635,428,1,800.0,685.0],
+[169,"떡케익1호 상","PET",0.65,720,485,6,325.0,287.5],
+[170,"떡케익1호 하","PS",0.9,755,500,6,325.0,325.0],
+[171,"떡케익2호 상","PET",0.8,570,295,2,500.0,402.5],
+[172,"떡케익2호 하","PS",1.0,580,300,2,500.0,500.0],
+[173,"떡케익3호 상","PET",0.8,680,350,2,900.0,747.5],
+[174,"떡케익3호 하","PS",1.0,690,355,2,900.0,862.5],
+[175,"떡케익3호 하(신형)(SD-K3-1)","PS",1.0,690,355,2,900.0,862.5],
+[176,"SD-700 꽃빙수","PS",0.6,610,410,6,180.0,103.5],
+[177,"미니꽃빙수","PET",0.45,695,500,12,90.0,90.0],
+[178,"원형빙수(하)","PET",0.6,610,410,6,180.0,149.5],
+[179,"원형빙수(상)","PET",0.3,575,375,8,90.0,75.0],
+[180,"SD-250 아이스꽃컵","PET",0.55,540,345,6,130.0,130.0],
+[181,"SD-250 아이스꽃컵 내피","PET",0.5,450,415,9,90.0,90.0],
+[182,"SH-K120 상","PET",0.55,545,370,6,130.0,120.0],
+[183,"SH-K120 하","PET금색",0.38,700,360,8,120.0,110.0],
+[184,"SH-K150 상","PET",0.75,720,440,6,250.0,250.0],
+[185,"SH-K150 하","PET",0.45,660,430,6,250.0,250.0],
+[186,"SH-H1 상","PET",0.5,555,388,10,75.0,70.0],
+[187,"SH-H1 하 금색","PET금색",0.38,440,400,8,95.0,90.0],
+[188,"SH-H1 하 은색","PET금색",0.38,440,400,8,95.0,90.0],
+[189,"SH-H1 하 백색 PET","PET",0.38,440,400,8,95.0,90.0],
+[190,"SH-H1 하 내피","PET",0.3,530,400,12,50.0,50.0],
+[191,"SH-41 (경단6구)","PET",0.25,530,355,12,50.0,35.0],
+[192,"SH-41-1","PET",0.25,530,460,16,50.0,35.0],
+[193,"SH-42 (맘모스220)","PET",0.25,455,490,9,65.0,50.0],
+[194,"SH-43 (맘모스260)","PET",0.2,500,505,9,65.0,50.0],
+[195,"SH-44 (휘낭시에)","PET",0.25,415,495,16,40.0,33.0],
+[196,"SH-45","PET",0.25,430,533,12,55.0,50.0],
+[197,"SH-46","PET",0.3,480,520,9,75.0,70.0],
+[198,"SH-47 PP (핫도그)","PP",0.73,480,453,8,100.0,90.0],
+[199,"SH-48","PET",0.2,485,465,9,65.0,60.0],
+[200,"SH-49 PP (바게트)","PP",0.65,560,450,6,120.0,110.0],
+[201,"SH-50","PET",0.48,415,515,9,80.0,75.0],
+[202,"SH-51","PET",0.43,420,490,9,75.0,70.0],
+[203,"SH-100 상","PET",0.7,415,535,12,95.0,85.0],
+[204,"SH-100 하","PET",0.5,380,490,12,85.0,75.0],
+[205,"SD-A1 (복주머니 트레이)","PET",0.5,435,535,6,180.0,150.0],
+[206,"SD-A2 (클로버 트레이)","PET",0.6,350,470,3,230.0,200.0],
+[207,"SD-하트","PET",0.45,450,575,6,180.0,150.0],
+[208,"SD-트리","PET",0.5,350,615,6,180.0,150.0],
+[209,"SD-팔각 (세트단가)","PET",0.5,485,470,4,250.0,220.0],
+[210,"SD-70 상 (샌드위치 소)","PET",0.45,610,348,8,85.0,75.0],
+[211,"SD-70 하 (샌드위치 소)","PET",0.34,510,340,6,100.0,90.0],
+[212,"SH-195 (초코파이)","PET",0.25,545,395,12,55.0,50.0],
+[213,"사각케익받침 PET 흑색","PET",0.36,460,460,15,55.0,50.0]
+];
+
+// ── 데이터 ──
+const DENSITY={'PET':1.34,'PET금색':1.34,'PS':1.05,'PS금색':1.05,'PP':0.93};
+let MP={PET:2100,'PET금색':4000,PS:2500,'PS금색':4300,PP:2600};
+let OV=JSON.parse(localStorage.getItem('shp_overrides')||'{}');
+let AD=JSON.parse(localStorage.getItem('shp_added')||'[]');
+let DL=JSON.parse(localStorage.getItem('shp_deleted')||'[]');
+
+function getD(){
+  return[
+    ...BASE_D.filter(r=>!DL.includes(r[0])).map(r=>OV[r[0]]?[r[0],...Object.values({1:r[1],2:r[2],3:r[3],4:r[4],5:r[5],6:r[6],7:r[7],8:r[8],...OV[r[0]]})]:r),
+    ...AD
+  ];
+}
+function saveL(){
+  localStorage.setItem('shp_overrides',JSON.stringify(OV));
+  localStorage.setItem('shp_added',JSON.stringify(AD));
+  localStorage.setItem('shp_deleted',JSON.stringify(DL));
+}
+
+function cost(r){
+  if(!r[3]||!r[4]||!r[5]||!r[6])return null;
+  return Math.round(r[3]*r[4]*r[5]*(DENSITY[r[2]]||1.34)/1000000*(MP[r[2]]||MP.PET)/r[6]);
+}
+function proc(r){
+  const c=cost(r);
+  return(c!==null&&r[7]&&r[6])?Math.round((r[7]-c)*r[6]):null;
+}
+
+// ── 원재료 ──
+function toggleMat(){
+  const p=document.getElementById('mat-panel'),b=document.getElementById('mat-toggle');
+  const o=p.classList.toggle('open');b.classList.toggle('open',o);
+}
+function updatePrices(){
+  MP={PET:+document.getElementById('mp-pet').value||2100,'PET금색':+document.getElementById('mp-petg').value||4000,PS:+document.getElementById('mp-ps').value||2500,'PS금색':+document.getElementById('mp-psg').value||4300,PP:+document.getElementById('mp-pp').value||2600};
+  document.getElementById('mat-summary').textContent=`PET ${MP.PET.toLocaleString()} · PS ${MP.PS.toLocaleString()} · PET금 ${MP['PET금색'].toLocaleString()}원/kg`;
+  render();
+}
+
+// ── 렌더 ──
+const CATS=[{l:'전체',k:'all'},{l:'화과자',k:'화과자'},{l:'SH-18x',k:'SH-1'},{l:'SH-B',k:'SH-B'},{l:'SH-C',k:'SH-C'},{l:'SH-R',k:'SH-R'},{l:'SH-S/T',k:'SH-S|SH-T'},{l:'마카롱',k:'마카롱'},{l:'뚱카롱',k:'뚱카롱'},{l:'떡케익',k:'떡케익'},{l:'기타',k:'기타'}];
+let aTag='all',sKey='',sQ='';
+
+function bdg(m){
+  const map={'PET':'<span class="badge b-pet">PET</span>','PET금색':'<span class="badge b-petg">PET금</span>','PS':'<span class="badge b-ps">PS</span>','PS금색':'<span class="badge b-psg">PS금</span>','PP':'<span class="badge b-pp">PP</span>','사출':'<span class="badge b-etc">사출</span>'};
+  return map[m]||map['PET'];
+}
+function mc(n,k){
+  if(k==='all')return true;
+  if(k==='기타')return!['화과자','SH-1','SH-B','SH-C','SH-R','SH-S','SH-T','마카롱','뚱카롱','떡케익'].some(p=>n.includes(p));
+  return k.split('|').some(p=>n.includes(p));
+}
+function fp(v){return v?Number(v).toLocaleString()+'원':'—';}
+function gf(){
+  let d=getD().filter(r=>(!sQ||r[1].toLowerCase().includes(sQ))&&mc(r[1],aTag));
+  const s={'no':(a,b)=>a[0]-b[0],'name':(a,b)=>a[1].localeCompare(b[1]),'gasc':(a,b)=>a[7]-b[7],'gdesc':(a,b)=>b[7]-a[7],'dasc':(a,b)=>a[8]-b[8],'ddesc':(a,b)=>b[8]-a[8]};
+  if(s[sKey])d.sort(s[sKey]);
+  return d;
+}
+function rTags(){document.getElementById('tags').innerHTML=CATS.map(c=>`<span class="tag ${aTag===c.k?'active':''}" onclick="setT('${c.k}')">${c.l}</span>`).join('');}
+function setT(k){aTag=k;rTags();render();}
+
+function render(){
+  const d=gf(),total=getD().length;
+  const prices=d.map(r=>r[7]).filter(v=>v>0);
+  document.getElementById('s-tot').textContent=total;
+  document.getElementById('s-fil').textContent=d.length;
+  document.getElementById('s-min').textContent=prices.length?Math.min(...prices).toLocaleString()+'원':'—';
+  document.getElementById('s-max').textContent=prices.length?Math.max(...prices).toLocaleString()+'원':'—';
+  if(!d.length){document.getElementById('list').innerHTML='';document.getElementById('no-res').style.display='block';return;}
+  document.getElementById('no-res').style.display='none';
+  document.getElementById('list').innerHTML=d.map(r=>{
+    const c=cost(r);
+    const mod=OV[r[0]]||AD.find(x=>x[0]===r[0]);
+    return`<div class="item-card${mod?' modified':''}" onclick="showD(${r[0]})">
+      <div class="item-no">${r[0]}</div>
+      <div class="item-body">
+        <div class="item-name">${r[1]}</div>
+        <div class="item-meta">${bdg(r[2])}${c!==null?`<span class="item-cost">원단가 ${c.toLocaleString()}원</span>`:''}</div>
+      </div>
+      <div class="item-prices">
+        <div class="price-gen">${fp(r[7])}</div>
+        <div class="price-dis">${fp(r[8])}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── 상세 ──
+function showD(id){
+  const r=getD().find(x=>x[0]===id);if(!r)return;
+  document.getElementById('d-nm').textContent=r[1];
+  document.getElementById('d-bd').innerHTML=bdg(r[2])+`<button class="d-edit-btn" onclick="openEdit(${id})">수정</button>`;
+  const c=cost(r),p=proc(r),dc=r[7]>0&&r[8]>0?Math.round((1-r[8]/r[7])*100):0;
+  let h='';
+  h+=`<div class="d-section">규격</div>`;
+  h+=`<div class="d-row"><span class="d-key">소재</span><span class="d-val">${r[2]}</span></div>`;
+  if(r[3])h+=`<div class="d-row"><span class="d-key">원단 두께</span><span class="d-val">${r[3]} mm</span></div>`;
+  if(r[4]&&r[5])h+=`<div class="d-row"><span class="d-key">이송 × 세로</span><span class="d-val">${r[4]} × ${r[5]} mm</span></div>`;
+  if(r[6])h+=`<div class="d-row"><span class="d-key">몰드홈 수량</span><span class="d-val">${r[6]}개 / 판</span></div>`;
+  h+=`<div class="d-section">원가 분석</div>`;
+  if(c!==null)h+=`<div class="d-row"><span class="d-key">1개당 원단가</span><span class="d-val v-muted">${c.toLocaleString()} 원</span></div>`;
+  if(p!==null)h+=`<div class="d-row"><span class="d-key">1판당 가공비</span><span class="d-val v-amber">${p.toLocaleString()} 원</span></div>`;
+  h+=`<div class="d-section">판매 단가</div>`;
+  h+=`<div class="d-row"><span class="d-key">일반단가</span><span class="d-val v-accent">${fp(r[7])}</span></div>`;
+  h+=`<div class="d-row"><span class="d-key">유통단가</span><span class="d-val v-green">${fp(r[8])}</span></div>`;
+  if(dc>0)h+=`<div class="d-row"><span class="d-key">유통 할인율</span><span class="d-val">${dc}%</span></div>`;
+  document.getElementById('d-rows').innerHTML=h;
+  openOv('ov-detail');
+}
+function closeDetail(){closeOv('ov-detail');}
+
+// ── 수정 ──
+let editId=null;
+function openEdit(id){
+  editId=id;const isNew=id===null;
+  document.getElementById('edit-title').textContent=isNew?'품목 추가':'품목 수정';
+  document.getElementById('ef-del').style.display=isNew?'none':'block';
+  if(isNew){['ef-name','ef-feed','ef-width','ef-thick','ef-mold','ef-gen','ef-dist'].forEach(i=>document.getElementById(i).value='');document.getElementById('ef-mat').value='PET';}
+  else{
+    const r=getD().find(x=>x[0]===id);if(!r)return;
+    document.getElementById('ef-name').value=r[1];
+    document.getElementById('ef-mat').value=r[2];
+    document.getElementById('ef-thick').value=r[3]||'';
+    document.getElementById('ef-feed').value=r[4]||'';
+    document.getElementById('ef-width').value=r[5]||'';
+    document.getElementById('ef-mold').value=r[6]||'';
+    document.getElementById('ef-gen').value=r[7]||'';
+    document.getElementById('ef-dist').value=r[8]||'';
+  }
+  closeOv('ov-detail');
+  openOv('ov-edit');
+}
+function closeEdit(){closeOv('ov-edit');}
+function saveEdit(){
+  const name=document.getElementById('ef-name').value.trim();
+  if(!name){alert('품명을 입력하세요');return;}
+  const vals=[null,name,document.getElementById('ef-mat').value,parseFloat(document.getElementById('ef-thick').value)||0,parseInt(document.getElementById('ef-feed').value)||0,parseInt(document.getElementById('ef-width').value)||0,parseInt(document.getElementById('ef-mold').value)||0,parseFloat(document.getElementById('ef-gen').value)||0,parseFloat(document.getElementById('ef-dist').value)||0];
+  if(editId===null){
+    vals[0]=Math.max(...BASE_D.map(r=>r[0]),...AD.map(r=>r[0]),0)+1;
+    AD.push(vals);
+  }else{
+    vals[0]=editId;
+    const ai=AD.findIndex(r=>r[0]===editId);
+    if(ai>=0)AD[ai]=vals;
+    else OV[editId]={1:name,2:vals[2],3:vals[3],4:vals[4],5:vals[5],6:vals[6],7:vals[7],8:vals[8]};
+  }
+  saveL();closeOv('ov-edit');render();
+}
+function deleteItem(){
+  if(!confirm('이 품목을 삭제하시겠습니까?'))return;
+  const ai=AD.findIndex(r=>r[0]===editId);
+  if(ai>=0)AD.splice(ai,1);else{DL.push(editId);delete OV[editId];}
+  saveL();closeOv('ov-edit');closeOv('ov-detail');render();
+}
+
+// ── 메모 ──
+function checkDot(){document.getElementById('memo-dot').classList.toggle('on',(localStorage.getItem('shp_memo')||'').trim().length>0);}
+function openMemo(){
+  document.getElementById('memo-ta').value=localStorage.getItem('shp_memo')||'';
+  const d=localStorage.getItem('shp_memo_date')||'';
+  document.getElementById('memo-date').textContent=d?`마지막 수정: ${d}`:'';
+  document.getElementById('memo-ok').style.display='none';
+  openOv('ov-memo');
+  setTimeout(()=>document.getElementById('memo-ta').focus(),300);
+}
+function closeMemo(){closeOv('ov-memo');}
+function saveMemo(){
+  const now=new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  localStorage.setItem('shp_memo',document.getElementById('memo-ta').value);
+  localStorage.setItem('shp_memo_date',now);
+  document.getElementById('memo-date').textContent=`마지막 수정: ${now}`;
+  const el=document.getElementById('memo-ok');el.style.display='block';
+  setTimeout(()=>{el.style.display='none';},2000);
+  checkDot();
+}
+
+// ── 내보내기 ──
+function openExport(){
+  const ok=Object.keys(OV),total=ok.length+AD.length+DL.length;
+  if(!total){alert('수정한 내용이 없습니다.\n품목을 수정·추가·삭제하면 여기서 내보낼 수 있어요.');return;}
+  let lines=[`=== 새한패키지 단가표 수정사항 ===`,`날짜: ${new Date().toLocaleString('ko-KR')}`,`총 ${total}건 (수정 ${ok.length}·추가 ${AD.length}·삭제 ${DL.length})`,``];
+  if(ok.length){
+    lines.push('[ 수정 ]');
+    ok.forEach(id=>{const orig=BASE_D.find(r=>r[0]==id),ov=OV[id];lines.push(`NO.${id} ${orig?orig[1]:'?'}`);const f={1:'품명',2:'소재',3:'두께',4:'이송',5:'세로',6:'몰드수',7:'일반단가',8:'유통단가'};Object.keys(ov).forEach(k=>{if(orig&&orig[k]!=ov[k])lines.push(`  ${f[k]}: ${orig[k]} → ${ov[k]}`);});});
+    lines.push('');
+  }
+  if(AD.length){
+    lines.push('[ 추가 ]');
+    AD.forEach(r=>lines.push(`NO.${r[0]} ${r[1]} / 소재:${r[2]} / 두께:${r[3]} / 이송:${r[4]} / 세로:${r[5]} / 몰드수:${r[6]} / 일반단가:${r[7]}원 / 유통단가:${r[8]}원`));
+    lines.push('');
+  }
+  if(DL.length){
+    lines.push('[ 삭제 ]');
+    DL.forEach(id=>{const o=BASE_D.find(r=>r[0]==id);lines.push(`NO.${id} ${o?o[1]:'?'}`);});
+    lines.push('');
+  }
+  lines.push('=== Claude에게 이 내용을 붙여넣기 하세요 ===');
+  document.getElementById('export-ta').value=lines.join('\n');
+  document.getElementById('export-info').textContent=`수정 ${ok.length}건 · 추가 ${AD.length}건 · 삭제 ${DL.length}건 — 복사 후 Claude에게 붙여넣으면 GitHub에 영구 반영됩니다`;
+  openOv('ov-export');
+}
+function closeExport(){closeOv('ov-export');}
+function copyExport(){
+  navigator.clipboard.writeText(document.getElementById('export-ta').value).then(()=>{const b=document.querySelector('.copy-btn');b.textContent='✓ 복사 완료!';setTimeout(()=>{b.textContent='📋 클립보드에 복사';},2200);}).catch(()=>{document.getElementById('export-ta').select();document.execCommand('copy');});
+}
+
+// ── 오버레이 헬퍼 ──
+function openOv(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeOv(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+
+// ── 박스히어로 ──
+function openBH(e){
+  const fb=setTimeout(()=>{window.location.href='https://web.boxhero-app.com';},1500);
+  window.addEventListener('blur',()=>clearTimeout(fb),{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(fb);},{once:true});
+}
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+document.getElementById('search').addEventListener('input',e=>{sQ=e.target.value.trim().toLowerCase();render();});
+document.getElementById('sort').addEventListener('change',e=>{sKey=e.target.value;render();});
+
+checkDot();rTags();render();
+</script>
+</body>
+</html>
