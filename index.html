@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>새한패키지 단가표</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -179,10 +180,43 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .adj-apply:active{opacity:.8}
 .adj-reset{width:100%;padding:12px;background:var(--bg);color:var(--txt2);border:1.5px solid var(--bdr2);border-radius:var(--rad);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .adj-reset:active{background:var(--bdr)}
+
+/* 로그인 화면 */
+#login-screen{display:none;position:fixed;inset:0;background:linear-gradient(145deg,#f0f9f1 0%,#eef4fd 100%);z-index:999;align-items:center;justify-content:center;flex-direction:column}
+#login-screen.show{display:flex}
+.login-card{background:#fff;border-radius:24px;padding:40px 32px 36px;max-width:340px;width:calc(100% - 40px);box-shadow:0 8px 40px rgba(30,100,180,.12),0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;gap:0}
+.login-logo{width:64px;height:64px;border-radius:16px;border:2px solid var(--bdr);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);margin-bottom:16px}
+.login-logo img{width:48px;height:48px;object-fit:contain}
+.login-brand{font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.login-title{font-size:22px;font-weight:800;color:var(--txt);letter-spacing:-.5px;margin-bottom:8px}
+.login-desc{font-size:13px;color:var(--txt2);text-align:center;line-height:1.6;margin-bottom:28px}
+#g-signin-btn{min-height:44px}
+.login-err{font-size:12px;color:var(--red);margin-top:14px;text-align:center;display:none;background:var(--red-bg);padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.15)}
+.login-err.show{display:block}
+
+/* 헤더 유저 영역 */
+.user-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:20px;background:var(--bg);border:1.5px solid var(--bdr);cursor:pointer;transition:background .15s}
+.user-chip:active{background:var(--bdr)}
+.user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.user-avatar-default{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.user-name{font-size:11px;font-weight:700;color:var(--txt2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- 로그인 화면 -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><img src="icon-192.png" alt="새한패키지" onerror="this.style.display='none'"></div>
+    <div class="login-brand">Saehan Package</div>
+    <div class="login-title">단가표</div>
+    <div class="login-desc">사용 권한이 있는 Google 계정으로<br>로그인하세요</div>
+    <div id="g-signin-btn"></div>
+    <div class="login-err" id="login-err">⚠ 허용되지 않은 계정입니다.<br>관리자에게 문의하세요.</div>
+  </div>
+</div>
+
+<div class="app" id="app-root" style="display:none">
   <!-- 헤더 -->
   <div class="hdr">
     <div class="hdr-top">
@@ -204,6 +238,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
         <a class="bh-btn" id="bh-link" href="boxhero://" target="_self">
           <span class="bh-dot"></span>재고확인
         </a>
+        <div class="user-chip" id="user-chip" onclick="signOut()" title="로그아웃" style="display:none">
+          <div class="user-avatar-default" id="user-avatar-default">?</div>
+          <img class="user-avatar" id="user-avatar-img" src="" alt="" style="display:none">
+          <span class="user-name" id="user-name-lbl"></span>
+        </div>
       </div>
     </div>
     <button class="mat-toggle" id="mat-toggle" onclick="toggleMat()">
@@ -372,6 +411,92 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 </div>
 
 <script>
+// ══════════════════════════════════════════
+//  ⚙ 구글 로그인 설정 (여기만 수정하세요)
+// ══════════════════════════════════════════
+const GOOGLE_CLIENT_ID = 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com';
+// 허용할 이메일 목록 (빈 배열이면 모든 Google 계정 허용)
+const ALLOWED_EMAILS = [
+  // 'user1@gmail.com',
+  // 'user2@company.com',
+];
+// 로그인 유지 시간 (시간 단위, 기본 12시간)
+const AUTH_EXPIRE_HOURS = 12;
+// ══════════════════════════════════════════
+
+// ── 구글 로그인 ──
+function initAuth(){
+  const saved = JSON.parse(localStorage.getItem('shp_auth_v2')||'null');
+  if(saved && saved.exp > Date.now()){
+    showApp(saved); return;
+  }
+  localStorage.removeItem('shp_auth_v2');
+  document.getElementById('login-screen').classList.add('show');
+  // GIS 버튼 렌더 (스크립트 로드 후 실행)
+  waitForGIS();
+}
+
+function waitForGIS(tries=0){
+  if(typeof google !== 'undefined' && google.accounts){
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleCredential,
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('g-signin-btn'),
+      {theme:'outline', size:'large', text:'signin_with', locale:'ko', shape:'pill'}
+    );
+  } else if(tries < 30){
+    setTimeout(()=>waitForGIS(tries+1), 200);
+  }
+}
+
+function handleCredential(resp){
+  try{
+    const parts = resp.credential.split('.');
+    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const email = payload.email || '';
+    const name  = payload.name  || email;
+    const pic   = payload.picture || '';
+    if(ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(email)){
+      document.getElementById('login-err').classList.add('show');
+      return;
+    }
+    document.getElementById('login-err').classList.remove('show');
+    const auth = {email, name, pic, exp: Date.now() + AUTH_EXPIRE_HOURS*3600*1000};
+    localStorage.setItem('shp_auth_v2', JSON.stringify(auth));
+    showApp(auth);
+  } catch(e){ console.error(e); }
+}
+
+function showApp(auth){
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('app-root').style.display='flex';
+  // 유저 칩 업데이트
+  const chip = document.getElementById('user-chip');
+  chip.style.display = 'inline-flex';
+  const shortName = (auth.name||'').split(' ')[0] || auth.email.split('@')[0];
+  document.getElementById('user-name-lbl').textContent = shortName;
+  if(auth.pic){
+    const img = document.getElementById('user-avatar-img');
+    img.src = auth.pic; img.style.display='block';
+    document.getElementById('user-avatar-default').style.display='none';
+  } else {
+    document.getElementById('user-avatar-default').textContent = shortName[0].toUpperCase();
+  }
+  // 앱 초기화
+  checkDot(); rTags(); render();
+}
+
+function signOut(){
+  if(!confirm(`로그아웃 하시겠습니까?`)) return;
+  localStorage.removeItem('shp_auth_v2');
+  document.getElementById('app-root').style.display='none';
+  document.getElementById('user-chip').style.display='none';
+  document.getElementById('login-screen').classList.add('show');
+  waitForGIS();
+}
+
 // ── 데이터 ── [NO, 품명, 소재, 두께, 원단폭, 이송, 몰드수, 일반단가, 유통단가, 입수량]
 const BASE_D = [
 [1,"화과자1구 상","PET",0.43,540,266,18,41.0,34.0,4800],
@@ -587,7 +712,7 @@ const BASE_D = [
 [210,"SD-A1 (복주머니 트레이)","PET",0.5,435,535,6,207.0,172.0,800],
 [211,"SD-A2 (클로버 트레이)","PET",0.6,350,470,3,264.0,230.0,480],
 [212,"SD-하트","PET",0.45,450,575,6,207.0,172.0,800],
-[213,"SD-트리","PET",0.5,350,615,3,207.0,172.0,540],
+[213,"SD-트리","PET",0.5,350,615,3,264.0,230.0,540],
 [214,"SD-팔각 (세트단가)","PET",0.5,485,470,4,288.0,253.0,1500],
 [215,"SD-70 상 (샌드위치 소)","PET",0.45,610,348,8,98.0,86.0,600],
 [216,"SD-70 하 (샌드위치 소)","PET",0.34,510,340,6,115.0,103.0,1200],
@@ -992,7 +1117,7 @@ document.getElementById('search').addEventListener('input',e=>{sQ=e.target.value
 document.getElementById('sort').addEventListener('change',e=>{sKey=e.target.value;render();});
 
 // ── 초기화 ──
-checkDot(); rTags(); render();
+initAuth();
 </script>
 </body>
 </html>
