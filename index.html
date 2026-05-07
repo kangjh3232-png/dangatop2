@@ -42,9 +42,6 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .ico-btn:active{background:var(--bdr)}
 .red-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid var(--card);display:none}
 .red-dot.on{display:block}
-.bh-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;box-shadow:0 2px 8px rgba(30,100,180,.25);transition:opacity .15s}
-.bh-btn:active{opacity:.8}
-.bh-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;flex-shrink:0}
 .mat-toggle{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:8px;background:none;border:none;border-top:1px solid var(--bdr);color:var(--txt2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.2px;transition:background .15s}
 .mat-toggle:active{background:var(--bg)}
 .mat-arrow{display:inline-block;transition:transform .25s;font-size:9px;color:var(--txt3)}
@@ -200,6 +197,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
 .user-avatar-default{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
 .user-name{font-size:11px;font-weight:700;color:var(--txt2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:400px){.user-name{display:none}.user-chip{padding:5px}}
 </style>
 </head>
 <body>
@@ -235,9 +233,6 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
         <button class="ico-btn" onclick="openExport()">📤</button>
         <button class="ico-btn" onclick="openAdj()">📊</button>
         <button class="ico-btn" onclick="downloadExcel()" title="엑셀 다운로드"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="16" height="16" rx="2.5" fill="#217346"/><text x="9" y="13" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="900" fill="white">XLS</text></svg></button>
-        <a class="bh-btn" id="bh-link" href="boxhero://" target="_self">
-          <span class="bh-dot"></span>재고확인
-        </a>
         <div class="user-chip" id="user-chip" onclick="signOut()" title="로그아웃" style="display:none">
           <div class="user-avatar-default" id="user-avatar-default">?</div>
           <img class="user-avatar" id="user-avatar-img" src="" alt="" style="display:none">
@@ -455,7 +450,11 @@ function waitForGIS(tries=0){
 function handleCredential(resp){
   try{
     const parts = resp.credential.split('.');
-    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    // UTF-8 한글 이름 포함 대응 디코딩
+    const raw = parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    const payload = JSON.parse(decodeURIComponent(
+      atob(raw).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')
+    ));
     const email = payload.email || '';
     const name  = payload.name  || email;
     const pic   = payload.picture || '';
@@ -1061,23 +1060,6 @@ function copyExport(){
 function openOv(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeOv(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
 
-// ── 박스히어로 ──
-(function(){
-  const btn=document.getElementById('bh-link'); if(!btn) return;
-  btn.addEventListener('click',function(e){
-    e.preventDefault();
-    const isAndroid=/Android/i.test(navigator.userAgent);
-    const isPWA=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone;
-    if(isAndroid&&isPWA){
-      window.location.href='intent://open#Intent;scheme=boxhero;package=com.bgpworks.boxhero;end';
-    } else {
-      window.location.href='boxhero://';
-      const fb=setTimeout(()=>{window.open('https://web.boxhero-app.com','_blank');},1500);
-      window.addEventListener('blur',()=>clearTimeout(fb),{once:true});
-      document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(fb);},{once:true});
-    }
-  });
-})();
 
 // ── 엑셀 다운로드 ──
 function downloadExcel(){
