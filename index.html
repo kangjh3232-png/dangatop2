@@ -422,11 +422,11 @@ const AUTH_EXPIRE_HOURS = 12;
 
 // ── 구글 로그인 ──
 function initAuth(){
-  const saved = JSON.parse(localStorage.getItem('shp_auth_v2')||'null');
+  const saved = JSON.parse(localStorage.getItem('shp_auth_v3')||'null');
   if(saved && saved.exp > Date.now()){
     showApp(saved); return;
   }
-  localStorage.removeItem('shp_auth_v2');
+  localStorage.removeItem('shp_auth_v3');
   document.getElementById('login-screen').classList.add('show');
   // GIS 버튼 렌더 (스크립트 로드 후 실행)
   waitForGIS();
@@ -464,7 +464,7 @@ function handleCredential(resp){
     }
     document.getElementById('login-err').classList.remove('show');
     const auth = {email, name, pic, exp: Date.now() + AUTH_EXPIRE_HOURS*3600*1000};
-    localStorage.setItem('shp_auth_v2', JSON.stringify(auth));
+    localStorage.setItem('shp_auth_v3', JSON.stringify(auth));
     showApp(auth);
   } catch(e){ console.error(e); }
 }
@@ -490,7 +490,7 @@ function showApp(auth){
 
 function signOut(){
   if(!confirm(`로그아웃 하시겠습니까?`)) return;
-  localStorage.removeItem('shp_auth_v2');
+  localStorage.removeItem('shp_auth_v3');
   document.getElementById('app-root').style.display='none';
   document.getElementById('user-chip').style.display='none';
   document.getElementById('login-screen').classList.add('show');
