@@ -633,16 +633,18 @@ function hideLoading(){ document.getElementById('loading-screen').classList.remo
 // ── AUTH ──
 async function initAuth(){
   showLoading();
-  // onAuthStateChange를 먼저 등록 (PKCE 콜백 이벤트를 놓치지 않기 위해)
+  try {
+    const {data:{session}} = await sb.auth.getSession();
+    if(session?.user){ await checkAccess(session.user); }
+    else { hideLoading(); document.getElementById('login-screen').classList.add('show'); }
+  } catch(e){
+    console.error('initAuth 오류:', e);
+    hideLoading(); document.getElementById('login-screen').classList.add('show');
+  }
   sb.auth.onAuthStateChange(async(event,session)=>{
-    console.log('[Auth]', event, session?.user?.email);
-    if((event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='TOKEN_REFRESHED')&&session?.user){
-      if(!CU) await checkAccess(session.user);  // 이미 처리됐으면 중복 방지
-    } else if(event==='INITIAL_SESSION'&&!session){
-      hideLoading();
-      document.getElementById('login-screen').classList.add('show');
-    } else if(event==='SIGNED_OUT'){
-      CU=null;
+    if(event==='SIGNED_IN'&&session?.user&&!CU){ await checkAccess(session.user); }
+    else if(event==='SIGNED_OUT'){
+      CU=null; hideLoading();
       document.getElementById('app-root').style.display='none';
       document.getElementById('login-screen').classList.add('show');
     }
@@ -650,7 +652,11 @@ async function initAuth(){
 }
 
 async function checkAccess(user){
-  const {data} = await sb.from('allowed_users').select('role,name').eq('email',user.email).maybeSingle();
+  let data = null;
+  try {
+    const res = await sb.from('allowed_users').select('role,name').eq('email',user.email).maybeSingle();
+    data = res.data;
+  } catch(e){ console.error('checkAccess 오류:', e); }
   hideLoading();
   if(!data){
     document.getElementById('login-screen').classList.remove('show');
