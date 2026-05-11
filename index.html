@@ -11,7 +11,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>새한패키지 단가표</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -40,8 +39,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .hdr-btns{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .ico-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--bg);border:1.5px solid var(--bdr);border-radius:10px;font-size:15px;cursor:pointer;position:relative;transition:background .15s}
 .ico-btn:active{background:var(--bdr)}
-.red-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--red);border-radius:50%;border:1.5px solid var(--card);display:none}
-.red-dot.on{display:block}
+.red-dot{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:var(--red);border-radius:8px;border:2px solid var(--card);display:none;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;padding:0 3px}
+.red-dot.on{display:flex}
 .mat-toggle{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;padding:8px;background:none;border:none;border-top:1px solid var(--bdr);color:var(--txt2);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:.2px;transition:background .15s}
 .mat-toggle:active{background:var(--bg)}
 .mat-arrow{display:inline-block;transition:transform .25s;font-size:9px;color:var(--txt3)}
@@ -80,9 +79,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 /* 목록 */
 .list-wrap{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg)}
 .list-inner{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
-.item-card{display:flex;align-items:center;padding:13px 14px;background:var(--card);border-radius:var(--rad);box-shadow:var(--shadow);gap:10px;cursor:pointer;border:1.5px solid var(--bdr);transition:transform .1s,box-shadow .1s;position:relative}
+.item-card{display:flex;align-items:center;padding:13px 14px;background:var(--card);border-radius:var(--rad);box-shadow:var(--shadow);gap:10px;cursor:pointer;border:1.5px solid var(--bdr);transition:transform .1s,box-shadow .1s}
 .item-card:active{transform:scale(.99);box-shadow:none}
-.item-card.modified{border-left:3px solid var(--amber)}
 .item-no{font-size:10px;font-weight:700;color:var(--txt3);min-width:22px;text-align:right;flex-shrink:0}
 .item-body{flex:1;min-width:0}
 .item-name{font-size:14px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
@@ -98,10 +96,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .item-prices{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
 .price-gen{font-size:15px;font-weight:800;color:var(--blue);letter-spacing:-.3px}
 .price-dis{font-size:11px;font-weight:600;color:var(--green)}
-.no-result{text-align:center;padding:80px 24px;color:var(--txt3);font-size:15px;line-height:1.8}
+.no-result{text-align:center;padding:60px 24px;color:var(--txt3);font-size:15px;line-height:2}
 
 /* FAB */
-.fab{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));right:20px;width:54px;height:54px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:50%;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(30,100,180,.35);z-index:50;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));right:20px;width:54px;height:54px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:50%;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(30,100,180,.35);z-index:50;display:none;align-items:center;justify-content:center;transition:transform .15s}
+.fab.show{display:flex}
 .fab:active{transform:scale(.91)}
 
 /* 오버레이 */
@@ -121,7 +120,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .d-head{padding:16px 20px 12px;border-bottom:1px solid var(--bdr)}
 .d-name{font-size:18px;font-weight:800;letter-spacing:-.4px;line-height:1.2}
 .d-meta{display:flex;align-items:center;gap:8px;margin-top:6px}
-.d-edit-btn{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-bdr);padding:3px 11px;border-radius:20px;cursor:pointer;font-family:inherit}
+.d-edit-btn{font-size:11px;font-weight:700;color:var(--blue);background:var(--blue-bg);border:1px solid var(--blue-bdr);padding:3px 11px;border-radius:20px;cursor:pointer;font-family:inherit;display:none}
+.d-edit-btn.show{display:inline-flex}
 .d-edit-btn:active{opacity:.7}
 .d-section{padding:8px 20px 5px;font-size:10px;font-weight:700;color:var(--txt3);background:var(--bg);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--bdr)}
 .d-row{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--bdr)}
@@ -146,23 +146,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .del-btn{width:100%;margin-top:4px;padding:13px;background:var(--red-bg);color:var(--red);border:1.5px solid rgba(220,38,38,.2);border-radius:var(--rad);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 .del-btn:active{opacity:.7}
 
-/* 메모 */
-.memo-date{padding:8px 20px 2px;font-size:11px;color:var(--txt3);font-weight:500}
-.memo-ta{width:100%;min-height:200px;padding:14px 20px;font-size:15px;border:none;outline:none;resize:none;font-family:inherit;color:var(--txt);line-height:1.7}
-.memo-ta::placeholder{color:var(--txt3)}
-.memo-ok{font-size:12px;font-weight:600;color:var(--green);padding:4px 20px 10px;display:none}
-
-/* 내보내기 */
-.export-info{font-size:12px;color:var(--txt2);padding:10px 20px 6px;line-height:1.5}
-.export-ta{width:100%;height:200px;padding:13px 20px;font-size:11px;border:none;outline:none;resize:none;font-family:'Courier New',monospace;color:var(--txt);line-height:1.6;background:var(--bg)}
-.copy-btn{display:block;width:calc(100% - 32px);margin:0 16px 8px;padding:14px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:var(--rad);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
-.copy-btn:active{opacity:.8}
-
 /* 단가조정 */
 .adj-desc{font-size:12px;color:var(--txt2);padding:10px 20px 4px;line-height:1.6}
 .adj-wrap{padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px}
 .adj-box{background:var(--bg);border-radius:var(--rad);padding:14px 16px;border:1.5px solid var(--bdr)}
-.adj-box-title{font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:10px;letter-spacing:.2px}
+.adj-box-title{font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:10px}
 .adj-row{display:flex;align-items:center;gap:10px}
 .adj-input{flex:1;padding:11px 14px;font-size:20px;font-weight:800;border:1.5px solid var(--bdr2);border-radius:var(--rad);background:var(--card);color:var(--txt);text-align:center;outline:none;font-family:inherit;transition:border-color .15s}
 .adj-input:focus{border-color:var(--blue)}
@@ -173,69 +161,147 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .adj-pre.dn{border-color:#fecaca;color:var(--red);background:var(--red-bg)}
 .adj-pre:active{opacity:.7}
 .adj-preview{font-size:11px;color:var(--txt3);margin-top:6px;min-height:16px;font-weight:500}
-.adj-apply{width:100%;padding:15px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:var(--rad);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(30,100,180,.2)}
+.adj-apply{width:100%;padding:15px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:var(--rad);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
 .adj-apply:active{opacity:.8}
-.adj-reset{width:100%;padding:12px;background:var(--bg);color:var(--txt2);border:1.5px solid var(--bdr2);border-radius:var(--rad);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-.adj-reset:active{background:var(--bdr)}
+
+/* 공유 메모 (채팅형) */
+.memo-list{flex:1;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:50dvh}
+.memo-msg{display:flex;gap:10px;align-items:flex-start}
+.memo-msg.own{flex-direction:row-reverse}
+.memo-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.memo-bubble{max-width:75%}
+.memo-meta{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.memo-msg.own .memo-meta{flex-direction:row-reverse}
+.memo-author{font-size:11px;font-weight:700;color:var(--txt2)}
+.memo-time{font-size:10px;color:var(--txt3)}
+.memo-del-btn{font-size:10px;color:var(--txt3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;opacity:.6}
+.memo-del-btn:hover{opacity:1;color:var(--red)}
+.memo-text{background:var(--bg);border:1.5px solid var(--bdr);border-radius:12px;padding:9px 13px;font-size:13px;line-height:1.6;word-break:break-word}
+.memo-msg.own .memo-text{background:var(--blue-bg);border-color:var(--blue-bdr)}
+.memo-input-row{display:flex;gap:8px;padding:10px 16px 4px;border-top:1px solid var(--bdr)}
+.memo-input{flex:1;padding:10px 14px;font-size:14px;border:1.5px solid var(--bdr2);border-radius:var(--rad);outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .15s;resize:none;height:44px;max-height:100px}
+.memo-input:focus{border-color:var(--blue)}
+.memo-send{padding:0 18px;height:44px;background:linear-gradient(135deg,var(--green),var(--blue));color:#fff;border:none;border-radius:var(--rad);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.memo-send:active{opacity:.8}
+.memo-empty{text-align:center;padding:30px;color:var(--txt3);font-size:13px;line-height:1.8}
+
+/* 공지 목록 */
+.notice-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bdr);align-items:flex-start}
+.notice-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.notice-body{flex:1}
+.notice-msg{font-size:14px;font-weight:600;color:var(--txt);line-height:1.4}
+.notice-time{font-size:11px;color:var(--txt3);margin-top:3px}
+.notice-unread{width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;margin-top:6px}
+
+/* 공지 팝업 */
+#ov-notice-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;backdrop-filter:blur(3px)}
+#ov-notice-popup.open{display:flex}
+.notice-popup-sheet{background:var(--card);border-radius:var(--rad-xl) var(--rad-xl) 0 0;width:100%;max-width:640px;margin:0 auto;padding:0 0 max(24px,env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.32,.72,0,1)}
+.notice-popup-body{padding:16px 20px 12px}
+.notice-popup-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-bg);border:1px solid #fcd34d;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+.notice-popup-msg{font-size:16px;font-weight:700;color:var(--txt);line-height:1.5;margin-bottom:6px}
+.notice-popup-time{font-size:12px;color:var(--txt3)}
+.notice-popup-footer{padding:8px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.notice-popup-counter{font-size:12px;color:var(--txt3);font-weight:600}
+
+/* 로딩 화면 */
+#loading-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#loading-screen.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--bdr);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:13px;color:var(--txt3);font-weight:500}
 
 /* 로그인 화면 */
-#login-screen{display:none;position:fixed;inset:0;background:linear-gradient(145deg,#f0f9f1 0%,#eef4fd 100%);z-index:999;align-items:center;justify-content:center;flex-direction:column}
+#login-screen{display:none;position:fixed;inset:0;background:linear-gradient(145deg,#f0f9f1 0%,#eef4fd 100%);z-index:400;align-items:center;justify-content:center}
 #login-screen.show{display:flex}
-.login-card{background:#fff;border-radius:24px;padding:40px 32px 36px;max-width:340px;width:calc(100% - 40px);box-shadow:0 8px 40px rgba(30,100,180,.12),0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;gap:0}
+.login-card{background:#fff;border-radius:24px;padding:40px 32px 36px;max-width:340px;width:calc(100% - 40px);box-shadow:0 8px 40px rgba(30,100,180,.12);display:flex;flex-direction:column;align-items:center}
 .login-logo{width:64px;height:64px;border-radius:16px;border:2px solid var(--bdr);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);margin-bottom:16px}
 .login-logo img{width:48px;height:48px;object-fit:contain}
 .login-brand{font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
-.login-title{font-size:22px;font-weight:800;color:var(--txt);letter-spacing:-.5px;margin-bottom:8px}
-.login-desc{font-size:13px;color:var(--txt2);text-align:center;line-height:1.6;margin-bottom:28px}
-#g-signin-btn{min-height:44px}
-.login-err{font-size:12px;color:var(--red);margin-top:14px;text-align:center;display:none;background:var(--red-bg);padding:8px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.15)}
+.login-title{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.login-desc{font-size:13px;color:var(--txt2);text-align:center;line-height:1.6;margin-bottom:24px}
+.google-login-btn{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fff;border:1.5px solid var(--bdr2);border-radius:var(--rad);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--txt);transition:box-shadow .15s;width:100%;justify-content:center}
+.google-login-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.google-login-btn:active{background:var(--bg)}
+.google-icon{width:20px;height:20px;flex-shrink:0}
+.login-err{font-size:12px;color:var(--red);margin-top:14px;text-align:center;background:var(--red-bg);padding:10px 14px;border-radius:8px;border:1px solid rgba(220,38,38,.15);width:100%;display:none}
 .login-err.show{display:block}
 
-/* 헤더 유저 영역 */
+/* 접근 거부 */
+#access-denied{display:none;position:fixed;inset:0;background:var(--bg);z-index:450;align-items:center;justify-content:center}
+#access-denied.show{display:flex}
+.denied-card{background:var(--card);border-radius:var(--rad-xl);padding:32px 28px;max-width:320px;width:calc(100% - 40px);text-align:center;box-shadow:var(--shadow)}
+.denied-icon{font-size:40px;margin-bottom:14px}
+.denied-title{font-size:17px;font-weight:800;color:var(--txt);margin-bottom:8px}
+.denied-desc{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:20px}
+.denied-btn{padding:12px 24px;background:var(--bg);border:1.5px solid var(--bdr2);border-radius:var(--rad);font-size:14px;font-weight:600;color:var(--txt2);cursor:pointer;font-family:inherit}
+
+/* 유저 칩 */
 .user-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 10px 5px 5px;border-radius:20px;background:var(--bg);border:1.5px solid var(--bdr);cursor:pointer;transition:background .15s}
 .user-chip:active{background:var(--bdr)}
 .user-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
-.user-avatar-default{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
-.user-name{font-size:11px;font-weight:700;color:var(--txt2);max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-avatar-def{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.user-name{font-size:11px;font-weight:700;color:var(--txt2);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:400px){.user-name{display:none}.user-chip{padding:5px}}
 </style>
 </head>
 <body>
 
-<!-- 로그인 화면 -->
+<!-- 로딩 -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-txt">불러오는 중…</div>
+</div>
+
+<!-- 로그인 -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo"><img src="icon-192.png" alt="새한패키지" onerror="this.style.display='none'"></div>
+    <div class="login-logo"><img src="icon-192.png" alt="" onerror="this.style.display='none'"></div>
     <div class="login-brand">Saehan Package</div>
     <div class="login-title">단가표</div>
-    <div class="login-desc">사용 권한이 있는 Google 계정으로<br>로그인하세요</div>
-    <div id="g-signin-btn"></div>
+    <div class="login-desc">Google 계정으로 로그인하세요</div>
+    <button class="google-login-btn" onclick="loginWithGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google로 로그인
+    </button>
     <div class="login-err" id="login-err">⚠ 허용되지 않은 계정입니다.<br>관리자에게 문의하세요.</div>
   </div>
 </div>
 
+<!-- 접근 거부 -->
+<div id="access-denied">
+  <div class="denied-card">
+    <div class="denied-icon">🚫</div>
+    <div class="denied-title">접근이 거부되었습니다</div>
+    <div class="denied-desc">이 앱을 사용할 권한이 없습니다.<br>관리자에게 문의하세요.</div>
+    <button class="denied-btn" onclick="doSignOut()">다른 계정으로 로그인</button>
+  </div>
+</div>
+
+<!-- 앱 본체 -->
 <div class="app" id="app-root" style="display:none">
-  <!-- 헤더 -->
   <div class="hdr">
     <div class="hdr-top">
       <div class="brand">
-        <div class="brand-logo"><img src="icon-192.png" alt="새한패키지"></div>
+        <div class="brand-logo"><img src="icon-192.png" alt="새한패키지" onerror="this.style.display='none'"></div>
         <div>
           <div class="brand-name">Saehan Package</div>
           <div class="brand-title">단가표</div>
         </div>
       </div>
       <div class="hdr-btns">
+        <button class="ico-btn" onclick="openMemo()">💬</button>
         <div style="position:relative;display:inline-flex">
-          <button class="ico-btn" onclick="openMemo()">📝</button>
-          <span class="red-dot" id="memo-dot"></span>
+          <button class="ico-btn" onclick="openNotices()">🔔</button>
+          <span class="red-dot" id="notice-dot"></span>
         </div>
-        <button class="ico-btn" onclick="openExport()">📤</button>
-        <button class="ico-btn" onclick="openAdj()">📊</button>
-        <button class="ico-btn" onclick="downloadExcel()" title="엑셀 다운로드"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="16" height="16" rx="2.5" fill="#217346"/><text x="9" y="13" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="900" fill="white">XLS</text></svg></button>
-        <div class="user-chip" id="user-chip" onclick="signOut()" title="로그아웃" style="display:none">
-          <div class="user-avatar-default" id="user-avatar-default">?</div>
-          <img class="user-avatar" id="user-avatar-img" src="" alt="" style="display:none">
+        <button class="ico-btn admin-only" onclick="openAdj()" id="adj-btn">📊</button>
+        <button class="ico-btn" onclick="downloadExcel()" title="엑셀 다운로드">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="16" height="16" rx="2.5" fill="#217346"/><text x="9" y="13" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="900" fill="white">XLS</text></svg>
+        </button>
+        <div class="user-chip" id="user-chip" onclick="doSignOut()" title="로그아웃" style="display:none">
+          <div class="user-avatar-def" id="user-av-def">?</div>
+          <img class="user-avatar" id="user-av-img" src="" alt="" style="display:none">
           <span class="user-name" id="user-name-lbl"></span>
         </div>
       </div>
@@ -245,7 +311,6 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
     </button>
   </div>
 
-  <!-- 원재료 단가 패널 -->
   <div class="mat-panel" id="mat-panel">
     <div class="mat-inner">
       <div class="mat-row">
@@ -260,7 +325,6 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
     </div>
   </div>
 
-  <!-- 검색 -->
   <div class="search-area">
     <div class="search-row">
       <div class="search-wrap">
@@ -282,15 +346,13 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
     <div class="tag-scroll" id="tags"></div>
   </div>
 
-  <!-- 통계 -->
   <div class="stat-bar">
-    <div class="stat-item"><div class="stat-lbl">전체</div><div class="stat-val" id="s-tot">0</div></div>
-    <div class="stat-item"><div class="stat-lbl">결과</div><div class="stat-val" id="s-fil">0</div></div>
+    <div class="stat-item"><div class="stat-lbl">전체</div><div class="stat-val" id="s-tot">—</div></div>
+    <div class="stat-item"><div class="stat-lbl">결과</div><div class="stat-val" id="s-fil">—</div></div>
     <div class="stat-item"><div class="stat-lbl">최저가</div><div class="stat-val" id="s-min">—</div></div>
     <div class="stat-item"><div class="stat-lbl">최고가</div><div class="stat-val" id="s-max">—</div></div>
   </div>
 
-  <!-- 목록 -->
   <div class="list-wrap">
     <div class="list-inner" id="list"></div>
     <div id="no-res" class="no-result" style="display:none">검색 결과가 없어요 😶</div>
@@ -298,7 +360,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 </div>
 
 <!-- FAB -->
-<button class="fab" onclick="openEdit(null)">+</button>
+<button class="fab admin-only" id="fab" onclick="openEdit(null)">+</button>
 
 <!-- 상세 -->
 <div class="ov" id="ov-detail" onclick="if(event.target===this)closeOv('ov-detail')">
@@ -310,7 +372,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
   </div>
 </div>
 
-<!-- 수정/추가 -->
+<!-- 수정/추가 (admin) -->
 <div class="ov" id="ov-edit" onclick="if(event.target===this)closeOv('ov-edit')">
   <div class="sheet scroll">
     <div class="drag-bar"></div>
@@ -338,470 +400,487 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
   </div>
 </div>
 
-<!-- 단가 일괄조정 -->
+<!-- 단가 일괄조정 (admin) -->
 <div class="ov" id="ov-adj" onclick="if(event.target===this)closeOv('ov-adj')">
   <div class="sheet scroll">
     <div class="drag-bar"></div>
     <div class="sh-head"><span class="sh-title">📊 단가 일괄조정</span><button class="sh-btn ghost" onclick="closeOv('ov-adj')">닫기</button></div>
-    <div class="adj-desc">전체 품목 단가를 퍼센트로 일괄 조정합니다. (+인상 / -인하)</div>
+    <div class="adj-desc">전체 품목 단가를 퍼센트로 일괄 조정합니다. DB에 영구 반영됩니다.</div>
     <div class="adj-wrap">
       <div class="adj-box">
         <div class="adj-box-title">일반단가 조정 (%)</div>
-        <div class="adj-row">
-          <input class="adj-input" id="adj-gen" type="number" step="0.1" placeholder="0" oninput="adjPreview()">
-          <span class="adj-unit">%</span>
-        </div>
+        <div class="adj-row"><input class="adj-input" id="adj-gen" type="number" step="0.1" placeholder="0" oninput="adjPreview()"><span class="adj-unit">%</span></div>
         <div class="adj-presets">
-          <button class="adj-pre up" onclick="setAdjVal('adj-gen',3)">+3%</button>
-          <button class="adj-pre up" onclick="setAdjVal('adj-gen',5)">+5%</button>
-          <button class="adj-pre up" onclick="setAdjVal('adj-gen',10)">+10%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-gen',-3)">-3%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-gen',-5)">-5%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-gen',-10)">-10%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-gen',3)">+3%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-gen',5)">+5%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-gen',10)">+10%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-gen',-3)">-3%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-gen',-5)">-5%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-gen',-10)">-10%</button>
         </div>
         <div class="adj-preview" id="adj-gen-prev"></div>
       </div>
       <div class="adj-box">
         <div class="adj-box-title">유통단가 조정 (%)</div>
-        <div class="adj-row">
-          <input class="adj-input" id="adj-dis" type="number" step="0.1" placeholder="0" oninput="adjPreview()">
-          <span class="adj-unit">%</span>
-        </div>
+        <div class="adj-row"><input class="adj-input" id="adj-dis" type="number" step="0.1" placeholder="0" oninput="adjPreview()"><span class="adj-unit">%</span></div>
         <div class="adj-presets">
-          <button class="adj-pre up" onclick="setAdjVal('adj-dis',3)">+3%</button>
-          <button class="adj-pre up" onclick="setAdjVal('adj-dis',5)">+5%</button>
-          <button class="adj-pre up" onclick="setAdjVal('adj-dis',10)">+10%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-dis',-3)">-3%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-dis',-5)">-5%</button>
-          <button class="adj-pre dn" onclick="setAdjVal('adj-dis',-10)">-10%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-dis',3)">+3%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-dis',5)">+5%</button>
+          <button class="adj-pre up" onclick="setAdj('adj-dis',10)">+10%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-dis',-3)">-3%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-dis',-5)">-5%</button>
+          <button class="adj-pre dn" onclick="setAdj('adj-dis',-10)">-10%</button>
         </div>
         <div class="adj-preview" id="adj-dis-prev"></div>
       </div>
-      <button class="adj-apply" onclick="applyAdj()">전체 적용</button>
-      <button class="adj-reset" onclick="resetAdj()">🔄 원래 단가로 복원</button>
+      <button class="adj-apply" id="adj-apply-btn" onclick="applyAdj()">전체 적용 (DB 영구 반영)</button>
     </div>
   </div>
 </div>
 
-<!-- 메모 -->
+<!-- 공유 메모 -->
 <div class="ov" id="ov-memo" onclick="if(event.target===this)closeOv('ov-memo')">
-  <div class="sheet">
+  <div class="sheet" style="display:flex;flex-direction:column;max-height:85dvh">
     <div class="drag-bar"></div>
-    <div class="sh-head"><span class="sh-title">📝 메모</span><button class="sh-btn" onclick="saveMemo()">저장</button></div>
-    <div class="memo-date" id="memo-date"></div>
-    <textarea class="memo-ta" id="memo-ta" placeholder="거래처 연락처, 특이사항, 할인 조건 등…"></textarea>
-    <div class="memo-ok" id="memo-ok">✓ 저장됐습니다</div>
+    <div class="sh-head"><span class="sh-title">💬 공유 메모</span><button class="sh-btn ghost" onclick="closeOv('ov-memo')">닫기</button></div>
+    <div class="memo-list" id="memo-list"><div class="memo-empty">메모가 없어요.<br>첫 번째 메모를 남겨보세요!</div></div>
+    <div class="memo-input-row">
+      <textarea class="memo-input" id="memo-input" placeholder="메모 입력…" rows="1" onkeydown="memoKeydown(event)"></textarea>
+      <button class="memo-send" onclick="sendMemo()">전송</button>
+    </div>
   </div>
 </div>
 
-<!-- 내보내기 -->
-<div class="ov" id="ov-export" onclick="if(event.target===this)closeOv('ov-export')">
-  <div class="sheet">
+<!-- 공지 목록 -->
+<div class="ov" id="ov-notices" onclick="if(event.target===this)closeOv('ov-notices')">
+  <div class="sheet scroll">
     <div class="drag-bar"></div>
-    <div class="sh-head"><span class="sh-title">📤 수정사항 내보내기</span><button class="sh-btn ghost" onclick="closeOv('ov-export')">닫기</button></div>
-    <div class="export-info" id="export-info"></div>
-    <textarea class="export-ta" id="export-ta" readonly></textarea>
-    <button class="copy-btn" onclick="copyExport()">📋 클립보드에 복사</button>
+    <div class="sh-head"><span class="sh-title">🔔 수정 공지</span><button class="sh-btn ghost" onclick="closeOv('ov-notices')">닫기</button></div>
+    <div id="notices-list"></div>
   </div>
 </div>
 
+<!-- 공지 팝업 (읽지 않은 공지) -->
+<div id="ov-notice-popup">
+  <div class="notice-popup-sheet">
+    <div class="drag-bar"></div>
+    <div class="sh-head">
+      <span class="sh-title">📢 수정 공지</span>
+      <span class="notice-popup-counter" id="popup-counter"></span>
+    </div>
+    <div class="notice-popup-body">
+      <div class="notice-popup-msg" id="popup-msg"></div>
+      <div class="notice-popup-time" id="popup-time"></div>
+    </div>
+    <div class="notice-popup-footer">
+      <div></div>
+      <button class="sh-btn" onclick="markCurrentRead()">확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ══════════════════════════════════════════
-//  ⚙ 구글 로그인 설정 (여기만 수정하세요)
-// ══════════════════════════════════════════
-const GOOGLE_CLIENT_ID = '383497881581-ac780qnth6a33hjllj1vgstpio43r7u3.apps.googleusercontent.com';
-// 허용할 이메일 목록 (빈 배열이면 모든 Google 계정 허용)
-const ALLOWED_EMAILS = [
-  'kangjh3232@gmail.com',
-  'saehanpackge@gmail.com',
-  'lovelycheso@gmail.com',
-  'sedam323232@gmail.com',
-];
-// 로그인 유지 시간 (시간 단위, 기본 12시간)
-const AUTH_EXPIRE_HOURS = 12;
-// ══════════════════════════════════════════
+// ══════════════════════════════════════
+//  ⚙ Supabase 설정
+// ══════════════════════════════════════
+const SUPABASE_URL  = 'https://abfomrtktqzbkvsyrufn.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_Cgx2ZY-dT0hMM3CHgHxkMA_4c6GIiDe';
+const REDIRECT_URL  = 'https://kangjh3232-png.github.io/dangatop2/';
+// ══════════════════════════════════════
 
-// ── 구글 로그인 ──
-function initAuth(){
-  const saved = JSON.parse(localStorage.getItem('shp_auth_v3')||'null');
-  if(saved && saved.exp > Date.now()){
-    showApp(saved); return;
-  }
-  localStorage.removeItem('shp_auth_v3');
-  document.getElementById('login-screen').classList.add('show');
-  // GIS 버튼 렌더 (스크립트 로드 후 실행)
-  waitForGIS();
-}
-
-function waitForGIS(tries=0){
-  if(typeof google !== 'undefined' && google.accounts){
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCredential,
-    });
-    google.accounts.id.renderButton(
-      document.getElementById('g-signin-btn'),
-      {theme:'outline', size:'large', text:'signin_with', locale:'ko', shape:'pill'}
-    );
-  } else if(tries < 30){
-    setTimeout(()=>waitForGIS(tries+1), 200);
-  }
-}
-
-function handleCredential(resp){
-  try{
-    const parts = resp.credential.split('.');
-    // UTF-8 한글 이름 포함 대응 디코딩
-    const raw = parts[1].replace(/-/g,'+').replace(/_/g,'/');
-    const payload = JSON.parse(decodeURIComponent(
-      atob(raw).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')
-    ));
-    const email = payload.email || '';
-    const name  = payload.name  || email;
-    const pic   = payload.picture || '';
-    if(ALLOWED_EMAILS.length > 0 && !ALLOWED_EMAILS.includes(email)){
-      document.getElementById('login-err').classList.add('show');
-      return;
-    }
-    document.getElementById('login-err').classList.remove('show');
-    const auth = {email, name, pic, exp: Date.now() + AUTH_EXPIRE_HOURS*3600*1000};
-    localStorage.setItem('shp_auth_v3', JSON.stringify(auth));
-    showApp(auth);
-  } catch(e){ console.error(e); }
-}
-
-function showApp(auth){
-  document.getElementById('login-screen').classList.remove('show');
-  document.getElementById('app-root').style.display='flex';
-  // 유저 칩 업데이트
-  const chip = document.getElementById('user-chip');
-  chip.style.display = 'inline-flex';
-  const shortName = (auth.name||'').split(' ')[0] || auth.email.split('@')[0];
-  document.getElementById('user-name-lbl').textContent = shortName;
-  if(auth.pic){
-    const img = document.getElementById('user-avatar-img');
-    img.src = auth.pic; img.style.display='block';
-    document.getElementById('user-avatar-default').style.display='none';
-  } else {
-    document.getElementById('user-avatar-default').textContent = shortName[0].toUpperCase();
-  }
-  // 앱 초기화
-  checkDot(); rTags(); render();
-}
-
-function signOut(){
-  if(!confirm(`로그아웃 하시겠습니까?`)) return;
-  localStorage.removeItem('shp_auth_v3');
-  document.getElementById('app-root').style.display='none';
-  document.getElementById('user-chip').style.display='none';
-  document.getElementById('login-screen').classList.add('show');
-  waitForGIS();
-}
-
-// ── 데이터 ── [NO, 품명, 소재, 두께, 원단폭, 이송, 몰드수, 일반단가, 유통단가, 입수량]
-const BASE_D = [
-[1,"화과자1구 상","PET",0.43,540,266,18,41.0,34.0,4800],
-[2,"화과자1구 하 PET 흑색","PET",0.34,510,252,18,39.0,30.0,4800],
-[3,"화과자1구 하 PET 금색","PET금색",0.36,510,252,18,52.0,40.0,4800],
-[4,"화과자1구 하 PET 투명","PET",0.34,510,252,18,39.0,30.0,4800],
-[5,"화과자2구 상","PET",0.47,590,305,12,75.0,69.0,2400],
-[6,"화과자2구 하 PET 흑색","PET",0.36,450,305,10,69.0,61.0,2400],
-[7,"화과자2구 하 PET 금색","PET금색",0.36,440,305,10,86.0,80.0,2400],
-[8,"화과자4구 상","PET",0.43,660,315,7,126.0,113.0,1500],
-[9,"화과자4구 하","PS",0.43,695,300,9,103.0,103.0,1500],
-[10,"화과자10구 상","PET",0.47,590,350,4,253.0,225.0,600],
-[11,"화과자10구 하 PET 흑색","PET",0.48,585,350,4,253.0,225.0,600],
-[12,"화과자16구 상","PET",0.47,590,300,2,414.0,358.0,280],
-[13,"화과자16구 하 PET 흑색","PET",0.48,585,300,2,414.0,358.0,280],
-[14,"화과자20구 상","PET",0.47,590,385,2,448.0,397.0,240],
-[15,"화과자20구 하 PET 흑색","PET",0.48,585,385,2,448.0,397.0,240],
-[16,"SH-180(저,상)","PET",0.43,545,335,15,57.0,57.0,2500],
-[17,"SH-180 하 PET 흑색","PET",0.36,450,320,16,69.0,60.0,2500],
-[18,"SH-180 상","PET",0.5,545,335,15,69.0,60.0,2500],
-[19,"SH-180 상 고","PET",0.6,545,335,15,80.0,71.0,2500],
-[20,"SH-180 하 PET 백색","PET",0.42,450,320,18,69.0,60.0,2500],
-[21,"SH-180 하 PET 투명","PET",0.42,450,320,18,69.0,60.0,2500],
-[22,"SH-190 상","PET",0.4,510,385,12,75.0,63.0,1800],
-[23,"SH-190 하 PET 흑색","PET",0.36,510,385,12,75.0,69.0,1800],
-[24,"SH-190 하 PET 금색","PET금색",0.38,520,385,12,103.0,103.0,1200],
-[25,"SH-200 상","PET",0.5,450,420,9,103.0,103.0,1200],
-[26,"SH-200 상 고","PET",0.84,360,360,4,184.0,115.0,1200],
-[27,"SH-200(하,투명)","PET",0.36,450,435,9,103.0,103.0,1200],
-[28,"SH-200(하,금색)","PET금색",0.38,460,435,9,126.0,126.0,1200],
-[29,"SH-300 상","PET",0.4,510,310,6,126.0,115.0,800],
-[30,"SH-300 하","PET",0.8,520,340,6,167.0,155.0,800],
-[31,"SH-01(사출컵) 상","PET",0.28,550,340,12,63.0,63.0,2000],
-[32,"SH-01(사출컵) 하","PET",0.0,0,0,0,230.0,172.0,2000],
-[33,"SH-01(사출컵) 하 PP","PP",0.0,0,0,0,230.0,172.0,500],
-[34,"SH-01(사출컵) 하 PS","PS",0.0,0,0,0,230.0,172.0,500],
-[35,"SH-02 상","PET",0.38,620,380,15,52.0,46.0,1500],
-[36,"SH-02 하","PET",0.5,600,370,15,63.0,57.0,3000],
-[37,"SH-B1 상","PET",0.43,540,334,15,52.0,51.0,2880],
-[38,"SH-B1 하 PS 흑색","PS",0.45,610,320,15,57.0,53.0,2880],
-[39,"SH-B1 하 PET 흑색","PET",0.34,510,320,12,57.0,53.0,2880],
-[40,"SH-B1 하 PET 금색","PET금색",0.38,520,320,12,75.0,67.0,2880],
-[219,"SH-B2 상","PET",0.43,480,480,16,45.0,42.0,1600],
-[220,"SH-B2 하","PET",0.6,500,500,16,55.0,53.0,3200],
-[41,"SH-B4 상","PET",0.47,590,345,6,138.0,132.0,800],
-[42,"SH-B4 하","PS",0.45,680,335,8,115.0,106.0,800],
-[43,"SH-B7 상 PP","PP",0.7,625,425,6,178.0,167.0,0],
-[44,"SH-B7 하 PP","PP",0.6,660,445,6,190.0,178.0,0],
-[45,"SH-B9 상","PET",0.43,760,500,4,276.0,252.0,0],
-[46,"SH-B9 하","PET",0.43,760,500,4,276.0,264.0,0],
-[47,"SH-B9 하 PP","PP",0.61,525,400,2,402.0,345.0,300],
-[48,"SH-B100 상","PET",0.6,575,410,1,977.0,977.0,100],
-[49,"SH-B100 하","PET",1.1,550,420,1,1380.0,1380.0,50],
-[50,"SH-B100 하 투명","PET",1.1,550,420,1,1380.0,1380.0,50],
-[51,"SH-C1(저) 하 PET 금색","PET금색",0.38,560,380,15,80.0,80.0,1800],
-[52,"SH-C1(고) 하 PET 금색","PET금색",0.38,560,380,15,80.0,67.0,1800],
-[53,"SH-C1(저) 상        압공","PET",0.43,400,519,12,80.0,72.0,1800],
-[54,"SH-C1(고) 상","PET",0.55,525,370,12,103.0,93.0,1800],
-[55,"SH-C2 상 저","PET",0.38,375,450,9,115.0,103.0,1200],
-[56,"SH-C2 상","PET",0.47,590,310,8,126.0,115.0,1200],
-[57,"SH-C2 상 고","PET",0.6,430,520,9,138.0,126.0,1200],
-[58,"SH-C2 하 PET 금색","PET금색",0.38,560,310,8,150.0,132.0,1200],
-[59,"SH-C2 하 PET 투명","PET",0.4,560,310,8,115.0,103.0,1200],
-[60,"SH-C2 하 PET 흑색","PET",0.4,560,310,8,115.0,103.0,1200],
-[61,"SH-C-1 하 PET 투명","PET",0.4,560,310,8,115.0,103.0,1200],
-[62,"SH-C3(저,상)","PET",0.47,590,360,15,69.0,67.0,1500],
-[63,"SH-C3(고,상)","PET",0.55,610,412,15,92.0,79.0,1500],
-[64,"SH-C3-1(고,상)","PET",0.6,520,395,15,63.0,57.0,1500],
-[65,"SH-C3(하, 투명)","PS",0.36,550,345,15,80.0,80.0,1500],
-[66,"SH-C3(하,백색)","PS",0.4,550,345,15,80.0,80.0,1500],
-[67,"SH-C3(하,흑색)","PS",0.4,550,345,15,80.0,67.0,1500],
-[68,"SH-C3 하 금색 PET","PET금색",0.4,550,345,15,92.0,92.0,1500],
-[69,"SH-C3(저,상)","PET",0.47,590,360,15,69.0,67.0,1500],
-[70,"SH-C4 상","PET",0.6,570,430,12,103.0,103.0,1200],
-[71,"SH-C4 상 고","PET",0.8,520,355,6,167.0,161.0,1200],
-[72,"SH-C4 하 투명","PET",0.36,510,385,12,103.0,103.0,1200],
-[73,"SH-C4 하 흑","PET",0.36,510,385,12,103.0,103.0,1200],
-[74,"SH-C4 하 금색원형","PET금색",0.38,520,275,8,126.0,106.0,1200],
-[75,"SH-C5 상 고","PET",0.8,500,305,6,155.0,146.0,1000],
-[76,"SH-C5 상 저","PET",0.55,540,400,12,80.0,75.0,1000],
-[77,"SH-C5 하 금색합지","PET금색",0.38,520,275,8,126.0,98.0,1000],
-[78,"SH-C5-1 하","PET",0.38,515,365,12,80.0,80.0,1000],
-[79,"SH-C6","PET",0.6,320,440,6,172.0,172.0,1500],
-[80,"SH-C7 상","PET",0.6,620,356,8,126.0,120.0,675],
-[81,"SH-C7 하","PET",0.4,620,356,8,103.0,103.0,675],
-[82,"SH-CC1 상","PET",0.6,580,305,2,460.0,402.0,140],
-[83,"SH-CC1 상 고","PET",0.6,580,305,2,460.0,423.0,140],
-[84,"SH-CC1 하","PET",0.45,635,305,2,402.0,402.0,140],
-[85,"SH-G1 상","PET",0.3,490,285,15,46.0,40.0,3600],
-[86,"SH-G1 하","PET",0.45,490,290,15,52.0,46.0,3600],
-[87,"SH-P1 상","PET",0.43,575,295,2,402.0,363.0,240],
-[88,"SH-P1 하","PET",0.43,575,295,2,402.0,363.0,240],
-[89,"SH-P2 상","PET",0.45,625,300,2,460.0,460.0,240],
-[90,"SH-P2 하","PET",0.45,620,325,2,460.0,460.0,240],
-[91,"SH-PT01 (상/하/포크 세트단가)","PET",0.38,430,477,12,244.0,233.0,0],
-[92,"SH-PT02 (상/하/포크 세트단가)","PET",0.38,430,480,12,276.0,259.0,0],
-[93,"SH-PT03 (상/하/포크 세트단가)","PET",0.38,430,470,8,296.0,276.0,0],
-[94,"SH-PT04 (상/하/포크 세트단가)","PET",0.38,430,420,6,322.0,316.0,0],
-[95,"SH-R1 상","PET",0.6,460,430,6,150.0,144.0,600],
-[96,"SH-R1 하","PET",0.36,450,385,6,126.0,115.0,600],
-[97,"SH-R1 하 (투명)","PET",0.36,450,385,6,126.0,115.0,600],
-[98,"SH-R02 상","PET",0.65,520,340,6,150.0,146.0,800],
-[99,"SH-R02 하 PET 흑색 / 백색","PET",0.4,640,325,8,103.0,93.0,800],
-[100,"SH-R02-1 하 PET 금색","PET금색",0.4,640,325,8,126.0,115.0,800],
-[101,"SH-R03 상","PET",0.6,490,450,8,126.0,115.0,1200],
-[102,"SH-R03 상 (3구)","PET",0.6,490,450,8,126.0,115.0,1200],
-[103,"SH-R03 하","PET",0.36,450,439,8,92.0,86.0,1200],
-[104,"SH-R03 하 (투명)","PET",0.36,450,439,8,92.0,86.0,1200],
-[105,"SH-R04 상 고","PET",0.58,510,365,10,86.0,82.0,1600],
-[106,"SH-R04 상 저","PET",0.36,460,340,10,75.0,57.0,1600],
-[107,"SH-R04(하,투명)","PET",0.4,460,345,10,75.0,74.0,1600],
-[108,"SH-R04(하,금색)","PET금색",0.38,450,345,10,86.0,79.0,1600],
-[109,"SH-R04-1 상 저","PET",0.36,460,300,10,75.0,57.0,1600],
-[110,"SH-R04-1 하 금색","PET금색",0.38,460,300,10,86.0,69.0,1600],
-[111,"SH-R05 저 상","PET",0.55,530,305,10,80.0,75.0,2000],
-[112,"SH-R05 상","PET",0.55,530,305,10,80.0,75.0,2000],
-[113,"SH-R05-1 상","PET",0.55,530,305,10,80.0,75.0,2000],
-[114,"SH-R05-1 상 저","PET",0.43,540,305,10,75.0,69.0,2000],
-[115,"SH-R05 하","PET금색",0.38,460,272,10,80.0,75.0,2000],
-[116,"SH-R06 상","PET",0.6,490,365,8,115.0,103.0,900],
-[117,"SH-R06 하","PET",0.4,460,345,8,92.0,86.0,900],
-[118,"SH-R06 하 (투명)","PET",0.4,460,345,8,92.0,86.0,900],
-[119,"SH-R07 상","PET",0.6,500,470,6,155.0,138.0,600],
-[120,"SH-R07 하","PET",0.5,515,430,8,109.0,92.0,600],
-[121,"SH-R120             압공","PET",0.43,500,490,6,161.0,138.0,640],
-[122,"SH-R130","PET",0.43,500,490,6,161.0,138.0,800],
-[123,"SH-S1                압공","PET",0.46,495,540,4,241.0,238.0,400],
-[124,"SH-S2 상","PET",0.36,575,465,8,172.0,172.0,1200],
-[125,"SH-S2 하 PET 금색","PET금색",0.68,430,470,8,230.0,230.0,600],
-[126,"SH-S2 하 PET 투명","PET",0.6,430,470,8,184.0,184.0,600],
-[127,"SH-S03 상","PET",0.36,550,350,10,80.0,79.0,1200],
-[128,"SH-S03 상 (고)","PET",0.36,550,350,10,80.0,79.0,1200],
-[129,"SH-S03 하 PET 투명","PET",0.43,550,350,10,103.0,79.0,1200],
-[130,"SH-S03 하 PET 금색","PET금색",0.43,550,350,10,103.0,98.0,1200],
-[131,"SH-S04               압공","PET",0.48,305,415,1,460.0,460.0,300],
-[132,"SH-S05 상","PET",0.36,550,327,10,80.0,69.0,1200],
-[133,"SH-S05 하 PET 금색","PET금색",0.51,460,323,8,115.0,109.0,1200],
-[134,"SH-S05 하 PET 투명","PET",0.45,475,323,8,92.0,86.0,1200],
-[135,"SH-S06 상","PET",0.38,345,490,4,167.0,144.0,1000],
-[136,"SH-S06 하","PET",0.48,345,490,4,178.0,155.0,1000],
-[137,"SH-T1 상","PET",0.55,555,360,8,126.0,126.0,1500],
-[138,"SH-T1(하,흑색)","PS",0.46,590,329,10,103.0,103.0,1500],
-[139,"SH-T1(하,백색)","PS",0.46,590,329,10,103.0,103.0,1500],
-[140,"SH-T1(하,투명)","PET",0.42,590,329,10,103.0,103.0,1500],
-[141,"SH-T2 상 저","PET",0.6,395,434,8,98.0,86.0,1500],
-[142,"SH-T2 상 고","PET",0.9,400,470,8,126.0,103.0,1500],
-[143,"SH-T2 하 PS 백색 / 흑색","PS",0.49,405,390,8,86.0,75.0,1500],
-[144,"SH-T2 하 PET 금색","PET금색",0.38,405,390,8,103.0,92.0,1500],
-[145,"SH-T3 상","PET",0.6,490,328,8,92.0,86.0,1500],
-[146,"SH-T3 하 PET 투명","PET",0.38,460,310,8,98.0,92.0,1500],
-[147,"SH-T4 상 저","PET",0.6,430,430,8,138.0,126.0,900],
-[148,"SH-T4 상 고","PET",1.0,430,430,6,184.0,172.0,900],
-[149,"SH-T4 하 PET 금색","PET금색",0.4,460,420,8,115.0,103.0,900],
-[150,"SH-T5 상 고","PET",0.75,555,350,8,126.0,103.0,800],
-[151,"SH-T5 상 저","PET",0.65,555,350,8,115.0,92.0,800],
-[152,"SH-T5 하 PET 흑색","PET",0.4,550,360,8,92.0,80.0,800],
-[153,"SH-T5-1 하 PET 흑색","PET",0.4,550,360,8,92.0,80.0,800],
-[154,"SH-T6 PP","PP",0.58,570,450,15,69.0,63.0,4950],
-[155,"SH-T6 PET 투명","PET",0.55,570,450,15,63.0,57.0,6600],
-[156,"SH-M2","PET",0.5,430,530,6,150.0,115.0,840],
-[157,"SH-M2 저","PET",0.4,460,610,6,86.0,79.0,560],
-[158,"마카롱3구 상","PET",0.43,490,410,10,86.0,79.0,1100],
-[159,"마카롱3구 하","PET",0.43,490,410,10,86.0,79.0,1100],
-[160,"마카롱4구","PET",0.45,580,490,4,460.0,402.0,600],
-[161,"마카롱5구 상","PET",0.45,580,300,6,126.0,125.0,1000],
-[162,"마카롱5구 하","PET",0.45,580,300,6,126.0,125.0,1000],
-[163,"마카롱8구","PET",0.45,580,415,2,460.0,402.0,260],
-[165,"뚱카롱3구           압공","PET",0.43,365,425,4,190.0,185.0,800],
-[166,"뚱카롱6구           압공","PET",0.43,365,425,2,379.0,345.0,400],
-[167,"뚱카롱5구           압공","PET",0.4,390,626,4,322.0,264.0,400],
-[168,"뚱카롱10구          압공","PET",0.4,390,626,2,575.0,460.0,180],
-[169,"마카롱 21구","PET",0.45,580,415,2,518.0,518.0,260],
-[170,"마카롱40구","PET",0.45,580,415,2,374.0,374.0,260],
-[171,"뚱카롱 24구","PET",0.45,705,475,2,518.0,490.0,200],
-[172,"뚱카롱 30구 1P","PET",0.5,635,428,1,977.0,788.0,60],
-[173,"뚱카롱 30구 2P","PET",0.5,635,428,1,920.0,788.0,60],
-[174,"떡케익1호 상","PET",0.65,720,485,6,374.0,331.0,240],
-[175,"떡케익1호 하","PS",0.9,755,500,6,374.0,374.0,240],
-[176,"떡케익2호 상","PET",0.8,570,295,2,575.0,463.0,160],
-[177,"떡케익2호 하","PS",1.0,580,300,2,575.0,575.0,160],
-[178,"떡케익3호 상","PET",0.8,680,350,2,1035.0,860.0,100],
-[179,"떡케익3호 하","PS",1.0,690,355,2,1035.0,992.0,100],
-[180,"떡케익3호 하(신형)(SD-K3-1)","PS",1.0,690,355,2,1035.0,992.0,100],
-[181,"SD-700 꽃빙수","PS",0.6,610,410,6,207.0,120.0,900],
-[182,"미니꽃빙수","PET",0.45,695,500,12,103.0,103.0,1100],
-[183,"원형빙수(하)","PET",0.6,610,410,6,207.0,172.0,900],
-[184,"원형빙수(상)","PET",0.3,575,375,8,103.0,86.0,900],
-[185,"SD-250 아이스꽃컵","PET",0.55,540,345,6,150.0,150.0,600],
-[186,"SD-250 아이스꽃컵 내피","PET",0.5,450,415,9,103.0,103.0,600],
-[187,"SH-K120 상","PET",0.55,545,370,6,150.0,138.0,840],
-[188,"SH-K120 하","PET",0.38,700,360,8,138.0,126.0,840],
-[189,"SH-K150 상","PET",0.75,720,440,6,288.0,288.0,240],
-[190,"SH-K150 하","PET",0.45,660,430,6,288.0,288.0,240],
-[191,"SH-H1 상","PET",0.5,555,388,10,86.0,80.0,900],
-[192,"SH-H1 하 금색","PET금색",0.38,440,400,8,109.0,103.0,900],
-[193,"SH-H1 하 은색","PET금색",0.38,440,400,8,109.0,103.0,900],
-[194,"SH-H1 하 백색 PET","PET",0.38,440,400,8,109.0,103.0,900],
-[195,"SH-H1 하 내피","PET",0.3,530,400,12,57.0,57.0,2700],
-[196,"SH-41 (경단6구)","PET",0.25,530,355,12,57.0,40.0,3200],
-[197,"SH-41-1","PET",0.25,530,460,16,57.0,40.0,4800],
-[198,"SH-42 (맘모스220)","PET",0.25,455,490,9,75.0,57.0,2700],
-[199,"SH-43 (맘모스260)","PET",0.2,500,505,9,75.0,57.0,3000],
-[200,"SH-44 (휘낭시에)","PET",0.25,415,495,16,46.0,38.0,5600],
-[201,"SH-45","PET",0.25,430,533,12,63.0,57.0,4320],
-[202,"SH-46","PET",0.3,480,520,9,86.0,80.0,2160],
-[203,"SH-47 PP (핫도그)","PP",0.73,480,453,8,115.0,103.0,1280],
-[204,"SH-48","PET",0.2,485,465,9,75.0,69.0,2880],
-[205,"SH-49 PP (바게트)","PP",0.65,560,450,6,138.0,126.0,1080],
-[206,"SH-50","PET",0.48,415,515,9,92.0,86.0,2000],
-[207,"SH-51","PET",0.43,420,490,9,86.0,80.0,800],
-[208,"SH-100 상","PET",0.7,415,535,12,109.0,98.0,1200],
-[209,"SH-100 하","PET",0.5,380,490,12,98.0,86.0,2400],
-[210,"SD-A1 (복주머니 트레이)","PET",0.5,435,535,6,207.0,172.0,800],
-[211,"SD-A2 (클로버 트레이)","PET",0.6,350,470,3,264.0,230.0,480],
-[212,"SD-하트","PET",0.45,450,575,6,207.0,172.0,800],
-[213,"SD-트리","PET",0.5,350,615,3,264.0,230.0,540],
-[214,"SD-팔각 (세트단가)","PET",0.5,485,470,4,288.0,253.0,1500],
-[215,"SD-70 상 (샌드위치 소)","PET",0.45,610,348,8,98.0,86.0,600],
-[216,"SD-70 하 (샌드위치 소)","PET",0.34,510,340,6,115.0,103.0,1200],
-[217,"SH-195 (초코파이)","PET",0.25,545,395,12,63.0,57.0,1620],
-[218,"사각케익받침 PET 흑색","PET",0.36,460,460,15,63.0,57.0,2860],
-[221,"SH-초코2구","PET",0.34,420,500,18,40.0,35.0,0]
-];
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── 상수 ──
 const DENSITY = {'PET':1.34,'PET금색':1.34,'PS':1.05,'PS금색':1.05,'PP':0.93};
 const CATS = [{l:'전체',k:'all'},{l:'화과자',k:'화과자'},{l:'SH-18x',k:'SH-1'},{l:'SH-B',k:'SH-B'},{l:'SH-C',k:'SH-C'},{l:'SH-R',k:'SH-R'},{l:'SH-S/T',k:'SH-S|SH-T'},{l:'마카롱',k:'마카롱'},{l:'뚱카롱',k:'뚱카롱'},{l:'떡케익',k:'떡케익'},{l:'기타',k:'기타'}];
 
+// ── 마이그레이션용 기존 데이터 ──
+const MIGRATE_DATA = [
+[1,"화과자1구 상","PET",0.43,540,266,18,41,34,4800],[2,"화과자1구 하 PET 흑색","PET",0.34,510,252,18,39,30,4800],
+[3,"화과자1구 하 PET 금색","PET금색",0.36,510,252,18,52,40,4800],[4,"화과자1구 하 PET 투명","PET",0.34,510,252,18,39,30,4800],
+[5,"화과자2구 상","PET",0.47,590,305,12,75,69,2400],[6,"화과자2구 하 PET 흑색","PET",0.36,450,305,10,69,61,2400],
+[7,"화과자2구 하 PET 금색","PET금색",0.36,440,305,10,86,80,2400],[8,"화과자4구 상","PET",0.43,660,315,7,126,113,1500],
+[9,"화과자4구 하","PS",0.43,695,300,9,103,103,1500],[10,"화과자10구 상","PET",0.47,590,350,4,253,225,600],
+[11,"화과자10구 하 PET 흑색","PET",0.48,585,350,4,253,225,600],[12,"화과자16구 상","PET",0.47,590,300,2,414,358,280],
+[13,"화과자16구 하 PET 흑색","PET",0.48,585,300,2,414,358,280],[14,"화과자20구 상","PET",0.47,590,385,2,448,397,240],
+[15,"화과자20구 하 PET 흑색","PET",0.48,585,385,2,448,397,240],[16,"SH-180(저,상)","PET",0.43,545,335,15,57,57,2500],
+[17,"SH-180 하 PET 흑색","PET",0.36,450,320,16,69,60,2500],[18,"SH-180 상","PET",0.5,545,335,15,69,60,2500],
+[19,"SH-180 상 고","PET",0.6,545,335,15,80,71,2500],[20,"SH-180 하 PET 백색","PET",0.42,450,320,18,69,60,2500],
+[21,"SH-180 하 PET 투명","PET",0.42,450,320,18,69,60,2500],[22,"SH-190 상","PET",0.4,510,385,12,75,63,1800],
+[23,"SH-190 하 PET 흑색","PET",0.36,510,385,12,75,69,1800],[24,"SH-190 하 PET 금색","PET금색",0.38,520,385,12,103,103,1200],
+[25,"SH-200 상","PET",0.5,450,420,9,103,103,1200],[26,"SH-200 상 고","PET",0.84,360,360,4,184,115,1200],
+[27,"SH-200(하,투명)","PET",0.36,450,435,9,103,103,1200],[28,"SH-200(하,금색)","PET금색",0.38,460,435,9,126,126,1200],
+[29,"SH-300 상","PET",0.4,510,310,6,126,115,800],[30,"SH-300 하","PET",0.8,520,340,6,167,155,800],
+[31,"SH-01(사출컵) 상","PET",0.28,550,340,12,63,63,2000],[32,"SH-01(사출컵) 하","PET",0,0,0,0,230,172,2000],
+[33,"SH-01(사출컵) 하 PP","PP",0,0,0,0,230,172,500],[34,"SH-01(사출컵) 하 PS","PS",0,0,0,0,230,172,500],
+[35,"SH-02 상","PET",0.38,620,380,15,52,46,1500],[36,"SH-02 하","PET",0.5,600,370,15,63,57,3000],
+[37,"SH-B1 상","PET",0.43,540,334,15,52,51,2880],[38,"SH-B1 하 PS 흑색","PS",0.45,610,320,15,57,53,2880],
+[39,"SH-B1 하 PET 흑색","PET",0.34,510,320,12,57,53,2880],[40,"SH-B1 하 PET 금색","PET금색",0.38,520,320,12,75,67,2880],
+[219,"SH-B2 상","PET",0.43,480,480,16,45,42,1600],[220,"SH-B2 하","PET",0.6,500,500,16,55,53,3200],
+[41,"SH-B4 상","PET",0.47,590,345,6,138,132,800],[42,"SH-B4 하","PS",0.45,680,335,8,115,106,800],
+[43,"SH-B7 상 PP","PP",0.7,625,425,6,178,167,0],[44,"SH-B7 하 PP","PP",0.6,660,445,6,190,178,0],
+[45,"SH-B9 상","PET",0.43,760,500,4,276,252,0],[46,"SH-B9 하","PET",0.43,760,500,4,276,264,0],
+[47,"SH-B9 하 PP","PP",0.61,525,400,2,402,345,300],[48,"SH-B100 상","PET",0.6,575,410,1,977,977,100],
+[49,"SH-B100 하","PET",1.1,550,420,1,1380,1380,50],[50,"SH-B100 하 투명","PET",1.1,550,420,1,1380,1380,50],
+[51,"SH-C1(저) 하 PET 금색","PET금색",0.38,560,380,15,80,80,1800],[52,"SH-C1(고) 하 PET 금색","PET금색",0.38,560,380,15,80,67,1800],
+[53,"SH-C1(저) 상 압공","PET",0.43,400,519,12,80,72,1800],[54,"SH-C1(고) 상","PET",0.55,525,370,12,103,93,1800],
+[55,"SH-C2 상 저","PET",0.38,375,450,9,115,103,1200],[56,"SH-C2 상","PET",0.47,590,310,8,126,115,1200],
+[57,"SH-C2 상 고","PET",0.6,430,520,9,138,126,1200],[58,"SH-C2 하 PET 금색","PET금색",0.38,560,310,8,150,132,1200],
+[59,"SH-C2 하 PET 투명","PET",0.4,560,310,8,115,103,1200],[60,"SH-C2 하 PET 흑색","PET",0.4,560,310,8,115,103,1200],
+[61,"SH-C-1 하 PET 투명","PET",0.4,560,310,8,115,103,1200],[62,"SH-C3(저,상)","PET",0.47,590,360,15,69,67,1500],
+[63,"SH-C3(고,상)","PET",0.55,610,412,15,92,79,1500],[64,"SH-C3-1(고,상)","PET",0.6,520,395,15,63,57,1500],
+[65,"SH-C3(하, 투명)","PS",0.36,550,345,15,80,80,1500],[66,"SH-C3(하,백색)","PS",0.4,550,345,15,80,80,1500],
+[67,"SH-C3(하,흑색)","PS",0.4,550,345,15,80,67,1500],[68,"SH-C3 하 금색 PET","PET금색",0.4,550,345,15,92,92,1500],
+[69,"SH-C3(저,상)","PET",0.47,590,360,15,69,67,1500],[70,"SH-C4 상","PET",0.6,570,430,12,103,103,1200],
+[71,"SH-C4 상 고","PET",0.8,520,355,6,167,161,1200],[72,"SH-C4 하 투명","PET",0.36,510,385,12,103,103,1200],
+[73,"SH-C4 하 흑","PET",0.36,510,385,12,103,103,1200],[74,"SH-C4 하 금색원형","PET금색",0.38,520,275,8,126,106,1200],
+[75,"SH-C5 상 고","PET",0.8,500,305,6,155,146,1000],[76,"SH-C5 상 저","PET",0.55,540,400,12,80,75,1000],
+[77,"SH-C5 하 금색합지","PET금색",0.38,520,275,8,126,98,1000],[78,"SH-C5-1 하","PET",0.38,515,365,12,80,80,1000],
+[79,"SH-C6","PET",0.6,320,440,6,172,172,1500],[80,"SH-C7 상","PET",0.6,620,356,8,126,120,675],
+[81,"SH-C7 하","PET",0.4,620,356,8,103,103,675],[82,"SH-CC1 상","PET",0.6,580,305,2,460,402,140],
+[83,"SH-CC1 상 고","PET",0.6,580,305,2,460,423,140],[84,"SH-CC1 하","PET",0.45,635,305,2,402,402,140],
+[85,"SH-G1 상","PET",0.3,490,285,15,46,40,3600],[86,"SH-G1 하","PET",0.45,490,290,15,52,46,3600],
+[87,"SH-P1 상","PET",0.43,575,295,2,402,363,240],[88,"SH-P1 하","PET",0.43,575,295,2,402,363,240],
+[89,"SH-P2 상","PET",0.45,625,300,2,460,460,240],[90,"SH-P2 하","PET",0.45,620,325,2,460,460,240],
+[91,"SH-PT01 (상/하/포크 세트단가)","PET",0.38,430,477,12,244,233,0],[92,"SH-PT02 (상/하/포크 세트단가)","PET",0.38,430,480,12,276,259,0],
+[93,"SH-PT03 (상/하/포크 세트단가)","PET",0.38,430,470,8,296,276,0],[94,"SH-PT04 (상/하/포크 세트단가)","PET",0.38,430,420,6,322,316,0],
+[95,"SH-R1 상","PET",0.6,460,430,6,150,144,600],[96,"SH-R1 하","PET",0.36,450,385,6,126,115,600],
+[97,"SH-R1 하 (투명)","PET",0.36,450,385,6,126,115,600],[98,"SH-R02 상","PET",0.65,520,340,6,150,146,800],
+[99,"SH-R02 하 PET 흑색 / 백색","PET",0.4,640,325,8,103,93,800],[100,"SH-R02-1 하 PET 금색","PET금색",0.4,640,325,8,126,115,800],
+[101,"SH-R03 상","PET",0.6,490,450,8,126,115,1200],[102,"SH-R03 상 (3구)","PET",0.6,490,450,8,126,115,1200],
+[103,"SH-R03 하","PET",0.36,450,439,8,92,86,1200],[104,"SH-R03 하 (투명)","PET",0.36,450,439,8,92,86,1200],
+[105,"SH-R04 상 고","PET",0.58,510,365,10,86,82,1600],[106,"SH-R04 상 저","PET",0.36,460,340,10,75,57,1600],
+[107,"SH-R04(하,투명)","PET",0.4,460,345,10,75,74,1600],[108,"SH-R04(하,금색)","PET금색",0.38,450,345,10,86,79,1600],
+[109,"SH-R04-1 상 저","PET",0.36,460,300,10,75,57,1600],[110,"SH-R04-1 하 금색","PET금색",0.38,460,300,10,86,69,1600],
+[111,"SH-R05 저 상","PET",0.55,530,305,10,80,75,2000],[112,"SH-R05 상","PET",0.55,530,305,10,80,75,2000],
+[113,"SH-R05-1 상","PET",0.55,530,305,10,80,75,2000],[114,"SH-R05-1 상 저","PET",0.43,540,305,10,75,69,2000],
+[115,"SH-R05 하","PET금색",0.38,460,272,10,80,75,2000],[116,"SH-R06 상","PET",0.6,490,365,8,115,103,900],
+[117,"SH-R06 하","PET",0.4,460,345,8,92,86,900],[118,"SH-R06 하 (투명)","PET",0.4,460,345,8,92,86,900],
+[119,"SH-R07 상","PET",0.6,500,470,6,155,138,600],[120,"SH-R07 하","PET",0.5,515,430,8,109,92,600],
+[121,"SH-R120 압공","PET",0.43,500,490,6,161,138,640],[122,"SH-R130","PET",0.43,500,490,6,161,138,800],
+[123,"SH-S1 압공","PET",0.46,495,540,4,241,238,400],[124,"SH-S2 상","PET",0.36,575,465,8,172,172,1200],
+[125,"SH-S2 하 PET 금색","PET금색",0.68,430,470,8,230,230,600],[126,"SH-S2 하 PET 투명","PET",0.6,430,470,8,184,184,600],
+[127,"SH-S03 상","PET",0.36,550,350,10,80,79,1200],[128,"SH-S03 상 (고)","PET",0.36,550,350,10,80,79,1200],
+[129,"SH-S03 하 PET 투명","PET",0.43,550,350,10,103,79,1200],[130,"SH-S03 하 PET 금색","PET금색",0.43,550,350,10,103,98,1200],
+[131,"SH-S04 압공","PET",0.48,305,415,1,460,460,300],[132,"SH-S05 상","PET",0.36,550,327,10,80,69,1200],
+[133,"SH-S05 하 PET 금색","PET금색",0.51,460,323,8,115,109,1200],[134,"SH-S05 하 PET 투명","PET",0.45,475,323,8,92,86,1200],
+[135,"SH-S06 상","PET",0.38,345,490,4,167,144,1000],[136,"SH-S06 하","PET",0.48,345,490,4,178,155,1000],
+[137,"SH-T1 상","PET",0.55,555,360,8,126,126,1500],[138,"SH-T1(하,흑색)","PS",0.46,590,329,10,103,103,1500],
+[139,"SH-T1(하,백색)","PS",0.46,590,329,10,103,103,1500],[140,"SH-T1(하,투명)","PET",0.42,590,329,10,103,103,1500],
+[141,"SH-T2 상 저","PET",0.6,395,434,8,98,86,1500],[142,"SH-T2 상 고","PET",0.9,400,470,8,126,103,1500],
+[143,"SH-T2 하 PS 백색 / 흑색","PS",0.49,405,390,8,86,75,1500],[144,"SH-T2 하 PET 금색","PET금색",0.38,405,390,8,103,92,1500],
+[145,"SH-T3 상","PET",0.6,490,328,8,92,86,1500],[146,"SH-T3 하 PET 투명","PET",0.38,460,310,8,98,92,1500],
+[147,"SH-T4 상 저","PET",0.6,430,430,8,138,126,900],[148,"SH-T4 상 고","PET",1.0,430,430,6,184,172,900],
+[149,"SH-T4 하 PET 금색","PET금색",0.4,460,420,8,115,103,900],[150,"SH-T5 상 고","PET",0.75,555,350,8,126,103,800],
+[151,"SH-T5 상 저","PET",0.65,555,350,8,115,92,800],[152,"SH-T5 하 PET 흑색","PET",0.4,550,360,8,92,80,800],
+[153,"SH-T5-1 하 PET 흑색","PET",0.4,550,360,8,92,80,800],[154,"SH-T6 PP","PP",0.58,570,450,15,69,63,4950],
+[155,"SH-T6 PET 투명","PET",0.55,570,450,15,63,57,6600],[156,"SH-M2","PET",0.5,430,530,6,150,115,840],
+[157,"SH-M2 저","PET",0.4,460,610,6,86,79,560],[158,"마카롱3구 상","PET",0.43,490,410,10,86,79,1100],
+[159,"마카롱3구 하","PET",0.43,490,410,10,86,79,1100],[160,"마카롱4구","PET",0.45,580,490,4,460,402,600],
+[161,"마카롱5구 상","PET",0.45,580,300,6,126,125,1000],[162,"마카롱5구 하","PET",0.45,580,300,6,126,125,1000],
+[163,"마카롱8구","PET",0.45,580,415,2,460,402,260],[165,"뚱카롱3구 압공","PET",0.43,365,425,4,190,185,800],
+[166,"뚱카롱6구 압공","PET",0.43,365,425,2,379,345,400],[167,"뚱카롱5구 압공","PET",0.4,390,626,4,322,264,400],
+[168,"뚱카롱10구 압공","PET",0.4,390,626,2,575,460,180],[169,"마카롱 21구","PET",0.45,580,415,2,518,518,260],
+[170,"마카롱40구","PET",0.45,580,415,2,374,374,260],[171,"뚱카롱 24구","PET",0.45,705,475,2,518,490,200],
+[172,"뚱카롱 30구 1P","PET",0.5,635,428,1,977,788,60],[173,"뚱카롱 30구 2P","PET",0.5,635,428,1,920,788,60],
+[174,"떡케익1호 상","PET",0.65,720,485,6,374,331,240],[175,"떡케익1호 하","PS",0.9,755,500,6,374,374,240],
+[176,"떡케익2호 상","PET",0.8,570,295,2,575,463,160],[177,"떡케익2호 하","PS",1.0,580,300,2,575,575,160],
+[178,"떡케익3호 상","PET",0.8,680,350,2,1035,860,100],[179,"떡케익3호 하","PS",1.0,690,355,2,1035,992,100],
+[180,"떡케익3호 하(신형)(SD-K3-1)","PS",1.0,690,355,2,1035,992,100],[181,"SD-700 꽃빙수","PS",0.6,610,410,6,207,120,900],
+[182,"미니꽃빙수","PET",0.45,695,500,12,103,103,1100],[183,"원형빙수(하)","PET",0.6,610,410,6,207,172,900],
+[184,"원형빙수(상)","PET",0.3,575,375,8,103,86,900],[185,"SD-250 아이스꽃컵","PET",0.55,540,345,6,150,150,600],
+[186,"SD-250 아이스꽃컵 내피","PET",0.5,450,415,9,103,103,600],[187,"SH-K120 상","PET",0.55,545,370,6,150,138,840],
+[188,"SH-K120 하","PET",0.38,700,360,8,138,126,840],[189,"SH-K150 상","PET",0.75,720,440,6,288,288,240],
+[190,"SH-K150 하","PET",0.45,660,430,6,288,288,240],[191,"SH-H1 상","PET",0.5,555,388,10,86,80,900],
+[192,"SH-H1 하 금색","PET금색",0.38,440,400,8,109,103,900],[193,"SH-H1 하 은색","PET금색",0.38,440,400,8,109,103,900],
+[194,"SH-H1 하 백색 PET","PET",0.38,440,400,8,109,103,900],[195,"SH-H1 하 내피","PET",0.3,530,400,12,57,57,2700],
+[196,"SH-41 (경단6구)","PET",0.25,530,355,12,57,40,3200],[197,"SH-41-1","PET",0.25,530,460,16,57,40,4800],
+[198,"SH-42 (맘모스220)","PET",0.25,455,490,9,75,57,2700],[199,"SH-43 (맘모스260)","PET",0.2,500,505,9,75,57,3000],
+[200,"SH-44 (휘낭시에)","PET",0.25,415,495,16,46,38,5600],[201,"SH-45","PET",0.25,430,533,12,63,57,4320],
+[202,"SH-46","PET",0.3,480,520,9,86,80,2160],[203,"SH-47 PP (핫도그)","PP",0.73,480,453,8,115,103,1280],
+[204,"SH-48","PET",0.2,485,465,9,75,69,2880],[205,"SH-49 PP (바게트)","PP",0.65,560,450,6,138,126,1080],
+[206,"SH-50","PET",0.48,415,515,9,92,86,2000],[207,"SH-51","PET",0.43,420,490,9,86,80,800],
+[208,"SH-100 상","PET",0.7,415,535,12,109,98,1200],[209,"SH-100 하","PET",0.5,380,490,12,98,86,2400],
+[210,"SD-A1 (복주머니 트레이)","PET",0.5,435,535,6,207,172,800],[211,"SD-A2 (클로버 트레이)","PET",0.6,350,470,3,264,230,480],
+[212,"SD-하트","PET",0.45,450,575,6,207,172,800],[213,"SD-트리","PET",0.5,350,615,3,264,230,540],
+[214,"SD-팔각 (세트단가)","PET",0.5,485,470,4,288,253,1500],[215,"SD-70 상 (샌드위치 소)","PET",0.45,610,348,8,98,86,600],
+[216,"SD-70 하 (샌드위치 소)","PET",0.34,510,340,6,115,103,1200],[217,"SH-195 (초코파이)","PET",0.25,545,395,12,63,57,1620],
+[218,"사각케익받침 PET 흑색","PET",0.36,460,460,15,63,57,2860],[221,"SH-초코2구","PET",0.34,420,500,18,40,35,0]
+];
+
 // ── 상태 ──
+let CU = null;           // 현재 사용자
+let products = [];       // Supabase 제품 목록
+let memos = [];          // Supabase 공유 메모
+let unreadNotices = [];  // 읽지 않은 공지
+let allNotices = [];     // 전체 공지
 let MP = {PET:2100,'PET금색':4000,PS:2500,'PS금색':4300,PP:2600};
-let OV = JSON.parse(localStorage.getItem('shp_overrides')||'{}');
-let AD = JSON.parse(localStorage.getItem('shp_added')||'[]');
-let DL = JSON.parse(localStorage.getItem('shp_deleted')||'[]');
-
-// 단가 조정 배율 (1.0 = 원본, 1.1 = +10%)
-let GEN_MULT = parseFloat(localStorage.getItem('shp_gen_mult')||'1');
-let DIS_MULT = parseFloat(localStorage.getItem('shp_dis_mult')||'1');
-
 let aTag='all', sKey='', sQ='', editId=null;
 
-// ── 데이터 조회 ──
-function getD(){
-  return [
-    ...BASE_D.filter(r => !DL.includes(r[0])).map(r => {
-      const ov = OV[r[0]];
-      return [
-        r[0],
-        ov&&ov[1]!=null ? ov[1] : r[1],
-        ov&&ov[2]!=null ? ov[2] : r[2],
-        ov&&ov[3]!=null ? ov[3] : r[3],
-        ov&&ov[4]!=null ? ov[4] : r[4],
-        ov&&ov[5]!=null ? ov[5] : r[5],
-        ov&&ov[6]!=null ? ov[6] : r[6],
-        Math.round((ov&&ov[7]!=null ? ov[7] : r[7]) * GEN_MULT),
-        Math.round((ov&&ov[8]!=null ? ov[8] : r[8]) * DIS_MULT),
-        ov&&ov[9]!=null ? ov[9] : (r[9]||0),
-      ];
-    }),
-    ...AD
-  ];
+// ── 유틸 ──
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function timeAgo(iso){
+  const s=Math.floor((Date.now()-new Date(iso))/1000);
+  if(s<60) return '방금'; if(s<3600) return Math.floor(s/60)+'분 전';
+  if(s<86400) return Math.floor(s/3600)+'시간 전';
+  const d=new Date(iso); return `${d.getMonth()+1}/${d.getDate()}`;
+}
+function fp(v){ return v?Math.round(Number(v)).toLocaleString()+'원':'—'; }
+function showLoading(){ document.getElementById('loading-screen').classList.add('show'); }
+function hideLoading(){ document.getElementById('loading-screen').classList.remove('show'); }
+
+// ── AUTH ──
+async function initAuth(){
+  showLoading();
+  const {data:{session}} = await sb.auth.getSession();
+  if(session?.user){ await checkAccess(session.user); }
+  else { hideLoading(); document.getElementById('login-screen').classList.add('show'); }
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(event==='SIGNED_IN'&&session){ await checkAccess(session.user); }
+    else if(event==='SIGNED_OUT'){ CU=null; document.getElementById('app-root').style.display='none'; document.getElementById('login-screen').classList.add('show'); }
+  });
 }
 
-function saveL(){
-  localStorage.setItem('shp_overrides', JSON.stringify(OV));
-  localStorage.setItem('shp_added', JSON.stringify(AD));
-  localStorage.setItem('shp_deleted', JSON.stringify(DL));
+async function checkAccess(user){
+  const {data} = await sb.from('allowed_users').select('role,name').eq('email',user.email).maybeSingle();
+  hideLoading();
+  if(!data){
+    document.getElementById('login-screen').classList.remove('show');
+    document.getElementById('access-denied').classList.add('show');
+    await sb.auth.signOut(); return;
+  }
+  const raw=user.user_metadata?.full_name||user.email.split('@')[0];
+  const name=data.name||raw;
+  CU={id:user.id,email:user.email,role:data.role,name,avatar:user.user_metadata?.avatar_url||''};
+  document.getElementById('login-screen').classList.remove('show');
+  document.getElementById('access-denied').classList.remove('show');
+  document.getElementById('login-err').classList.remove('show');
+  await initApp();
+}
+
+async function loginWithGoogle(){
+  const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:REDIRECT_URL}});
+  if(error) alert('로그인 오류: '+error.message);
+}
+async function doSignOut(){
+  if(!confirm('로그아웃 하시겠습니까?')) return;
+  await sb.auth.signOut();
+}
+
+// ── 앱 초기화 ──
+async function initApp(){
+  document.getElementById('app-root').style.display='flex';
+  updateUserChip();
+  applyRole();
+  rTags();
+  await loadProducts();
+  await loadNotices();
+  subscribeRealtime();
+}
+
+function updateUserChip(){
+  const chip=document.getElementById('user-chip'); chip.style.display='inline-flex';
+  document.getElementById('user-name-lbl').textContent=CU.name;
+  if(CU.avatar){
+    document.getElementById('user-av-img').src=CU.avatar;
+    document.getElementById('user-av-img').style.display='block';
+    document.getElementById('user-av-def').style.display='none';
+  } else {
+    document.getElementById('user-av-def').textContent=CU.name[0].toUpperCase();
+  }
+}
+
+function applyRole(){
+  const isAdmin=CU.role==='admin';
+  document.querySelectorAll('.admin-only').forEach(el=>{
+    el.style.display=isAdmin?(el.tagName==='BUTTON'||el.classList.contains('fab')?'flex':'flex'):'none';
+  });
+  if(isAdmin) document.getElementById('fab').classList.add('show');
+}
+
+// ── 제품 CRUD ──
+async function loadProducts(){
+  const {data,error}=await sb.from('products').select('*').order('no');
+  if(error){console.error(error);return;}
+  products=data||[]; render();
+}
+
+async function saveEdit(){
+  const name=document.getElementById('ef-name').value.trim();
+  if(!name){alert('품명을 입력하세요');return;}
+  const isNew=editId===null;
+  const row={
+    name, material:document.getElementById('ef-mat').value,
+    thickness:parseFloat(document.getElementById('ef-thick').value)||0,
+    feed_width:parseInt(document.getElementById('ef-feed').value)||0,
+    transfer:parseInt(document.getElementById('ef-width').value)||0,
+    mold_count:parseInt(document.getElementById('ef-mold').value)||0,
+    box_qty:parseInt(document.getElementById('ef-box').value)||0,
+    price_general:parseFloat(document.getElementById('ef-gen').value)||0,
+    price_dist:parseFloat(document.getElementById('ef-dist').value)||0,
+  };
+  document.querySelector('#ov-edit .sh-btn').textContent='저장 중…';
+  if(isNew){
+    const maxNo=products.reduce((m,p)=>Math.max(m,p.no),0);
+    row.no=maxNo+1;
+    const {data,error}=await sb.from('products').insert(row).select().single();
+    if(error){alert('오류: '+error.message);document.querySelector('#ov-edit .sh-btn').textContent='저장';return;}
+    await createNotice('add',data);
+  } else {
+    const {data,error}=await sb.from('products').update(row).eq('id',editId).select().single();
+    if(error){alert('오류: '+error.message);document.querySelector('#ov-edit .sh-btn').textContent='저장';return;}
+    await createNotice('update',data);
+  }
+  document.querySelector('#ov-edit .sh-btn').textContent='저장';
+  closeOv('ov-edit'); await loadProducts();
+}
+
+async function deleteItem(){
+  const p=products.find(x=>x.id===editId); if(!p) return;
+  if(!confirm(`"${p.name}" 제품을 삭제하시겠습니까?`)) return;
+  const {error}=await sb.from('products').delete().eq('id',editId);
+  if(error){alert('오류: '+error.message);return;}
+  await createNotice('delete',p);
+  closeOv('ov-edit'); closeOv('ov-detail'); await loadProducts();
+}
+
+// ── 공지 ──
+async function createNotice(type,p){
+  const msgs={add:`${p.name} 제품이 추가되었습니다`,update:`${p.name} 제품 가격이 수정되었습니다`,delete:`${p.name} 제품이 삭제되었습니다`};
+  await sb.from('notices').insert({type,product_no:p.no,product_name:p.name,message:msgs[type],created_by:CU.id});
+}
+
+async function loadNotices(){
+  const {data:notices}=await sb.from('notices').select('*').order('created_at',{ascending:false}).limit(50);
+  const {data:reads}=await sb.from('notice_reads').select('notice_id').eq('user_id',CU.id);
+  allNotices=notices||[];
+  const readSet=new Set((reads||[]).map(r=>r.notice_id));
+  unreadNotices=allNotices.filter(n=>!readSet.has(n.id));
+  updateNoticeBadge();
+  if(unreadNotices.length>0) showNoticePopup(unreadNotices[0]);
+}
+
+function updateNoticeBadge(){
+  const dot=document.getElementById('notice-dot');
+  const cnt=unreadNotices.length;
+  if(cnt>0){dot.textContent=cnt>9?'9+':cnt;dot.classList.add('on');}
+  else dot.classList.remove('on');
+}
+
+function showNoticePopup(n){
+  document.getElementById('popup-msg').textContent=n.message;
+  document.getElementById('popup-time').textContent=new Date(n.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('popup-counter').textContent=unreadNotices.length>1?`${unreadNotices.length}개 읽지 않음`:'';
+  document.getElementById('ov-notice-popup').classList.add('open');
+}
+
+async function markCurrentRead(){
+  const n=unreadNotices[0]; if(!n) return;
+  await sb.from('notice_reads').upsert({notice_id:n.id,user_id:CU.id},{onConflict:'notice_id,user_id'});
+  unreadNotices=unreadNotices.slice(1);
+  updateNoticeBadge();
+  if(unreadNotices.length>0) showNoticePopup(unreadNotices[0]);
+  else document.getElementById('ov-notice-popup').classList.remove('open');
+}
+
+function openNotices(){
+  const list=document.getElementById('notices-list');
+  const readIds=new Set();
+  sb.from('notice_reads').select('notice_id').eq('user_id',CU.id).then(({data})=>{
+    (data||[]).forEach(r=>readIds.add(r.notice_id));
+    list.innerHTML=allNotices.length?allNotices.map(n=>{
+      const read=readIds.has(n.id);
+      const icon=n.type==='add'?'🆕':n.type==='delete'?'🗑':'✏️';
+      return `<div class="notice-item">
+        <div class="notice-icon">${icon}</div>
+        <div class="notice-body">
+          <div class="notice-msg">${escHtml(n.message)}</div>
+          <div class="notice-time">${new Date(n.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        ${!read?'<div class="notice-unread"></div>':''}
+      </div>`;
+    }).join(''):'<div style="padding:40px;text-align:center;color:var(--txt3)">공지가 없습니다</div>';
+  });
+  openOv('ov-notices');
+}
+
+// ── 메모 ──
+async function loadMemos(){
+  const {data}=await sb.from('memos').select('*').order('created_at',{ascending:true}).limit(100);
+  memos=data||[]; renderMemos();
+}
+
+function renderMemos(){
+  const list=document.getElementById('memo-list');
+  if(!memos.length){list.innerHTML='<div class="memo-empty">메모가 없어요.<br>첫 번째 메모를 남겨보세요! 💬</div>';return;}
+  const wasBot=list.scrollHeight-list.scrollTop<=list.clientHeight+60;
+  list.innerHTML=memos.map(m=>{
+    const own=m.user_id===CU?.id;
+    const ini=(m.user_name||'?')[0].toUpperCase();
+    const canDel=own||CU?.role==='admin';
+    return `<div class="memo-msg${own?' own':''}">
+      <div class="memo-av">${ini}</div>
+      <div class="memo-bubble">
+        <div class="memo-meta">
+          <span class="memo-author">${escHtml(m.user_name||'?')}</span>
+          <span class="memo-time">${timeAgo(m.created_at)}</span>
+          ${canDel?`<button class="memo-del-btn" onclick="deleteMemo('${m.id}')">×</button>`:''}
+        </div>
+        <div class="memo-text">${escHtml(m.content)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  if(wasBot) list.scrollTop=list.scrollHeight;
+}
+
+async function sendMemo(){
+  const ta=document.getElementById('memo-input');
+  const content=ta.value.trim(); if(!content) return;
+  await sb.from('memos').insert({content,user_id:CU.id,user_name:CU.name,user_email:CU.email});
+  ta.value='';
+}
+
+async function deleteMemo(id){
+  if(!confirm('메모를 삭제하시겠습니까?')) return;
+  await sb.from('memos').delete().eq('id',id);
+}
+
+function memoKeydown(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMemo();}
+}
+
+function openMemo(){
+  openOv('ov-memo');
+  loadMemos();
+  setTimeout(()=>{const l=document.getElementById('memo-list');l.scrollTop=l.scrollHeight;},200);
+}
+
+// ── 실시간 구독 ──
+function subscribeRealtime(){
+  sb.channel('rt-products').on('postgres_changes',{event:'*',schema:'public',table:'products'},()=>loadProducts()).subscribe();
+  sb.channel('rt-memos').on('postgres_changes',{event:'*',schema:'public',table:'memos'},()=>loadMemos()).subscribe();
+  sb.channel('rt-notices').on('postgres_changes',{event:'INSERT',schema:'public',table:'notices'},payload=>{
+    if(payload.new.created_by!==CU?.id){
+      unreadNotices.unshift(payload.new); allNotices.unshift(payload.new);
+      updateNoticeBadge();
+      if(unreadNotices.length===1) showNoticePopup(unreadNotices[0]);
+    } else {
+      allNotices.unshift(payload.new);
+    }
+  }).subscribe();
 }
 
 // ── 계산 ──
-function calcCost(r){
-  if(!r[3]||!r[4]||!r[5]||!r[6]) return null;
-  return Math.round(r[3]*r[4]*r[5]*(DENSITY[r[2]]||1.34)/1000000*(MP[r[2]]||MP.PET)/r[6]);
+function calcCost(p){
+  if(!p.thickness||!p.feed_width||!p.transfer||!p.mold_count) return null;
+  return Math.round(p.thickness*p.feed_width*p.transfer*(DENSITY[p.material]||1.34)/1000000*(MP[p.material]||MP.PET)/p.mold_count);
 }
-// 일반단가 기준 1판당 가공비
-function calcProc(r){
-  const c = calcCost(r);
-  return (c!==null&&r[7]&&r[6]) ? Math.round((r[7]-c)*r[6]) : null;
-}
-// 유통단가 기준 1판당 가공비
-function calcProcDist(r){
-  const c = calcCost(r);
-  return (c!==null&&r[8]&&r[6]) ? Math.round((r[8]-c)*r[6]) : null;
-}
-function calcWeight(r){
-  if(!r[3]||!r[4]||!r[5]||!r[6]) return null;
-  const w = r[3]*r[4]*r[5]*(DENSITY[r[2]]||1.34)/1000/r[6];
-  return Math.round(w*10)/10;
-}
-function fp(v){ return v ? Math.round(Number(v)).toLocaleString()+'원' : '—'; }
-
-// ── 원재료 ──
-function toggleMat(){
-  const p=document.getElementById('mat-panel'), b=document.getElementById('mat-toggle');
-  const o=p.classList.toggle('open'); b.classList.toggle('open',o);
-}
-function updateMP(){
-  MP = {
-    PET: +document.getElementById('mp-pet').value||2100,
-    'PET금색': +document.getElementById('mp-petg').value||4000,
-    PS: +document.getElementById('mp-ps').value||2500,
-    'PS금색': +document.getElementById('mp-psg').value||4300,
-    PP: +document.getElementById('mp-pp').value||2600,
-  };
-  render();
+function calcProc(p){ const c=calcCost(p); return(c!==null&&p.price_general&&p.mold_count)?Math.round((p.price_general-c)*p.mold_count):null; }
+function calcProcDist(p){ const c=calcCost(p); return(c!==null&&p.price_dist&&p.mold_count)?Math.round((p.price_dist-c)*p.mold_count):null; }
+function calcWeight(p){
+  if(!p.thickness||!p.feed_width||!p.transfer||!p.mold_count) return null;
+  return Math.round(p.thickness*p.feed_width*p.transfer*(DENSITY[p.material]||1.34)/1000/p.mold_count*10)/10;
 }
 
 // ── 렌더 ──
@@ -809,55 +888,49 @@ function bdg(m){
   const map={'PET':'<span class="badge b-pet">PET</span>','PET금색':'<span class="badge b-petg">PET금</span>','PS':'<span class="badge b-ps">PS</span>','PS금색':'<span class="badge b-psg">PS금</span>','PP':'<span class="badge b-pp">PP</span>','사출':'<span class="badge b-etc">사출</span>'};
   return map[m]||map['PET'];
 }
-function mc(n,k){
+function mc(name,k){
   if(k==='all') return true;
-  if(k==='기타') return !['화과자','SH-1','SH-B','SH-C','SH-R','SH-S','SH-T','마카롱','뚱카롱','떡케익'].some(p=>n.includes(p));
-  return k.split('|').some(p=>n.includes(p));
+  if(k==='기타') return !['화과자','SH-1','SH-B','SH-C','SH-R','SH-S','SH-T','마카롱','뚱카롱','떡케익'].some(p=>name.includes(p));
+  return k.split('|').some(p=>name.includes(p));
 }
 function gf(){
-  let d = getD().filter(r=>(!sQ||r[1].toLowerCase().includes(sQ))&&mc(r[1],aTag));
-  const sorts = {
-    'no':(a,b)=>a[0]-b[0], 'name':(a,b)=>a[1].localeCompare(b[1]),
-    'gasc':(a,b)=>a[7]-b[7], 'gdesc':(a,b)=>b[7]-a[7],
-    'dasc':(a,b)=>a[8]-b[8], 'ddesc':(a,b)=>b[8]-a[8],
-    'pasc':(a,b)=>(calcProc(a)||0)-(calcProc(b)||0),
-    'pdesc':(a,b)=>(calcProc(b)||0)-(calcProc(a)||0),
-  };
+  let d=products.filter(p=>(!sQ||p.name.toLowerCase().includes(sQ))&&mc(p.name,aTag));
+  const sorts={'no':(a,b)=>a.no-b.no,'name':(a,b)=>a.name.localeCompare(b.name),'gasc':(a,b)=>a.price_general-b.price_general,'gdesc':(a,b)=>b.price_general-a.price_general,'dasc':(a,b)=>a.price_dist-b.price_dist,'ddesc':(a,b)=>b.price_dist-a.price_dist,'pasc':(a,b)=>(calcProc(a)||0)-(calcProc(b)||0),'pdesc':(a,b)=>(calcProc(b)||0)-(calcProc(a)||0)};
   if(sorts[sKey]) d.sort(sorts[sKey]);
   return d;
 }
-function rTags(){
-  document.getElementById('tags').innerHTML = CATS.map(c=>
-    `<span class="tag ${aTag===c.k?'active':''}" onclick="setT('${c.k}')">${c.l}</span>`
-  ).join('');
-}
-function setT(k){ aTag=k; rTags(); render(); }
+function rTags(){ document.getElementById('tags').innerHTML=CATS.map(c=>`<span class="tag${aTag===c.k?' active':''}" onclick="setT('${c.k}')">${c.l}</span>`).join(''); }
+function setT(k){aTag=k;rTags();render();}
 
 function render(){
-  const d=gf(), total=getD().length;
-  const prices=d.map(r=>r[7]).filter(v=>v>0);
-  document.getElementById('s-tot').textContent=total;
+  const d=gf();
+  const prices=d.map(p=>p.price_general).filter(v=>v>0);
+  document.getElementById('s-tot').textContent=products.length;
   document.getElementById('s-fil').textContent=d.length;
   document.getElementById('s-min').textContent=prices.length?Math.min(...prices).toLocaleString()+'원':'—';
   document.getElementById('s-max').textContent=prices.length?Math.max(...prices).toLocaleString()+'원':'—';
+  if(!d.length&&products.length===0&&CU?.role==='admin'){
+    document.getElementById('list').innerHTML='';
+    document.getElementById('no-res').innerHTML='제품 데이터가 없습니다.<br><button onclick="migrateData()" class="sh-btn" style="margin-top:16px;display:inline-block">📦 기존 데이터 불러오기</button>';
+    document.getElementById('no-res').style.display='block'; return;
+  }
   if(!d.length){
     document.getElementById('list').innerHTML='';
-    document.getElementById('no-res').style.display='block';
-    return;
+    document.getElementById('no-res').innerHTML='검색 결과가 없어요 😶';
+    document.getElementById('no-res').style.display='block'; return;
   }
   document.getElementById('no-res').style.display='none';
-  document.getElementById('list').innerHTML=d.map(r=>{
-    const c=calcCost(r);
-    const mod=OV[r[0]]||AD.find(x=>x[0]===r[0]);
-    return `<div class="item-card${mod?' modified':''}" onclick="showD(${r[0]})">
-      <div class="item-no">${r[0]}</div>
+  document.getElementById('list').innerHTML=d.map(p=>{
+    const c=calcCost(p);
+    return `<div class="item-card" onclick="showD('${p.id}')">
+      <div class="item-no">${p.no}</div>
       <div class="item-body">
-        <div class="item-name">${r[1]}</div>
-        <div class="item-meta">${bdg(r[2])}${c!==null?`<span class="item-cost">원단가 ${c.toLocaleString()}원</span>`:''}</div>
+        <div class="item-name">${escHtml(p.name)}</div>
+        <div class="item-meta">${bdg(p.material)}${c!==null?`<span class="item-cost">원단가 ${c.toLocaleString()}원</span>`:''}</div>
       </div>
       <div class="item-prices">
-        <div class="price-gen">${fp(r[7])}</div>
-        <div class="price-dis">${fp(r[8])}</div>
+        <div class="price-gen">${fp(p.price_general)}</div>
+        <div class="price-dis">${fp(p.price_dist)}</div>
       </div>
     </div>`;
   }).join('');
@@ -865,242 +938,120 @@ function render(){
 
 // ── 상세 ──
 function showD(id){
-  const r=getD().find(x=>x[0]===id); if(!r) return;
-  document.getElementById('d-nm').textContent=r[1];
-  document.getElementById('d-bd').innerHTML=bdg(r[2])+`<button class="d-edit-btn" onclick="openEdit(${id})">수정</button>`;
-  const c=calcCost(r), p=calcProc(r), pd=calcProcDist(r);
-  const dc=r[7]>0&&r[8]>0?Math.round((1-r[8]/r[7])*100):0;
+  const p=products.find(x=>x.id===id); if(!p) return;
+  document.getElementById('d-nm').textContent=p.name;
+  const editBtn=document.getElementById('d-bd');
+  editBtn.innerHTML=bdg(p.material)+(CU?.role==='admin'?`<button class="d-edit-btn show" onclick="openEdit('${id}')">수정</button>`:'');
+  const c=calcCost(p),proc=calcProc(p),procD=calcProcDist(p),w=calcWeight(p);
+  const dc=p.price_general>0&&p.price_dist>0?Math.round((1-p.price_dist/p.price_general)*100):0;
   let h='';
-
-  // 규격
   h+=`<div class="d-section">규격</div>`;
-  h+=`<div class="d-row"><span class="d-key">소재</span><span class="d-val">${r[2]}</span></div>`;
-  if(r[3]) h+=`<div class="d-row"><span class="d-key">원단 두께</span><span class="d-val">${r[3]}mm</span></div>`;
-  if(r[4]&&r[5]) h+=`<div class="d-row"><span class="d-key">원단폭 × 이송</span><span class="d-val">${r[4]} × ${r[5]}mm</span></div>`;
-  if(r[6]) h+=`<div class="d-row"><span class="d-key">몰드홈 수량</span><span class="d-val">${r[6]}개/판</span></div>`;
-  if(r[9]) h+=`<div class="d-row"><span class="d-key">박스 입수량</span><span class="d-val">${r[9].toLocaleString()}개</span></div>`;
-
-  // 원가 분석
+  h+=`<div class="d-row"><span class="d-key">소재</span><span class="d-val">${p.material}</span></div>`;
+  if(p.thickness) h+=`<div class="d-row"><span class="d-key">원단 두께</span><span class="d-val">${p.thickness}mm</span></div>`;
+  if(p.feed_width&&p.transfer) h+=`<div class="d-row"><span class="d-key">원단폭 × 이송</span><span class="d-val">${p.feed_width} × ${p.transfer}mm</span></div>`;
+  if(p.mold_count) h+=`<div class="d-row"><span class="d-key">몰드홈 수량</span><span class="d-val">${p.mold_count}개/판</span></div>`;
+  if(p.box_qty) h+=`<div class="d-row"><span class="d-key">박스 입수량</span><span class="d-val">${p.box_qty.toLocaleString()}개</span></div>`;
   h+=`<div class="d-section">원가 분석</div>`;
-  const w=calcWeight(r);
   if(w!==null) h+=`<div class="d-row"><span class="d-key">개당 중량</span><span class="d-val vm">${w}g</span></div>`;
   if(c!==null) h+=`<div class="d-row"><span class="d-key">1개당 원단가</span><span class="d-val vm">${c.toLocaleString()}원</span></div>`;
-
-  // 판매 단가 — 일반
   h+=`<div class="d-section">일반단가</div>`;
-  h+=`<div class="d-row"><span class="d-key">일반단가</span><span class="d-val vb">${fp(r[7])}</span></div>`;
-  if(p!==null) h+=`<div class="d-row"><span class="d-key">1판당 가공비</span><span class="d-val va">${p.toLocaleString()}원</span></div>`;
-
-  // 판매 단가 — 유통
+  h+=`<div class="d-row"><span class="d-key">일반단가</span><span class="d-val vb">${fp(p.price_general)}</span></div>`;
+  if(proc!==null) h+=`<div class="d-row"><span class="d-key">1판당 가공비</span><span class="d-val va">${proc.toLocaleString()}원</span></div>`;
   h+=`<div class="d-section">유통단가</div>`;
-  h+=`<div class="d-row"><span class="d-key">유통단가</span><span class="d-val vg">${fp(r[8])}</span></div>`;
-  if(pd!==null) h+=`<div class="d-row"><span class="d-key">1판당 가공비</span><span class="d-val vp">${pd.toLocaleString()}원</span></div>`;
+  h+=`<div class="d-row"><span class="d-key">유통단가</span><span class="d-val vg">${fp(p.price_dist)}</span></div>`;
+  if(procD!==null) h+=`<div class="d-row"><span class="d-key">1판당 가공비</span><span class="d-val vp">${procD.toLocaleString()}원</span></div>`;
   if(dc>0) h+=`<div class="d-row"><span class="d-key">유통 할인율</span><span class="d-val">${dc}%</span></div>`;
-
   document.getElementById('d-rows').innerHTML=h;
   openOv('ov-detail');
 }
 
-// ── 수정/추가 ──
+// ── 수정 폼 ──
 function openEdit(id){
   editId=id; const isNew=id===null;
   document.getElementById('edit-title').textContent=isNew?'품목 추가':'품목 수정';
   document.getElementById('ef-del').style.display=isNew?'none':'block';
   if(isNew){
-    ['ef-name','ef-feed','ef-width','ef-thick','ef-mold','ef-box','ef-gen','ef-dist'].forEach(i=>document.getElementById(i).value='');
+    ['ef-name','ef-thick','ef-feed','ef-width','ef-mold','ef-box','ef-gen','ef-dist'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('ef-mat').value='PET';
   } else {
-    const r=getD().find(x=>x[0]===id); if(!r) return;
-    document.getElementById('ef-name').value=r[1];
-    document.getElementById('ef-mat').value=r[2];
-    document.getElementById('ef-thick').value=r[3]||'';
-    document.getElementById('ef-feed').value=r[4]||'';
-    document.getElementById('ef-width').value=r[5]||'';
-    document.getElementById('ef-mold').value=r[6]||'';
-    document.getElementById('ef-box').value=r[9]||'';
-    document.getElementById('ef-gen').value=r[7]||'';
-    document.getElementById('ef-dist').value=r[8]||'';
+    const p=products.find(x=>x.id===id); if(!p) return;
+    document.getElementById('ef-name').value=p.name;
+    document.getElementById('ef-mat').value=p.material;
+    document.getElementById('ef-thick').value=p.thickness||'';
+    document.getElementById('ef-feed').value=p.feed_width||'';
+    document.getElementById('ef-width').value=p.transfer||'';
+    document.getElementById('ef-mold').value=p.mold_count||'';
+    document.getElementById('ef-box').value=p.box_qty||'';
+    document.getElementById('ef-gen').value=p.price_general||'';
+    document.getElementById('ef-dist').value=p.price_dist||'';
   }
-  closeOv('ov-detail');
-  openOv('ov-edit');
-}
-function saveEdit(){
-  const name=document.getElementById('ef-name').value.trim();
-  if(!name){ alert('품명을 입력하세요'); return; }
-  const vals=[
-    null,name,
-    document.getElementById('ef-mat').value,
-    parseFloat(document.getElementById('ef-thick').value)||0,
-    parseInt(document.getElementById('ef-feed').value)||0,
-    parseInt(document.getElementById('ef-width').value)||0,
-    parseInt(document.getElementById('ef-mold').value)||0,
-    parseFloat(document.getElementById('ef-gen').value)||0,
-    parseFloat(document.getElementById('ef-dist').value)||0,
-    parseInt(document.getElementById('ef-box').value)||0,
-  ];
-  if(editId===null){
-    vals[0]=Math.max(...BASE_D.map(r=>r[0]),...AD.map(r=>r[0]),0)+1;
-    AD.push(vals);
-  } else {
-    vals[0]=editId;
-    const ai=AD.findIndex(r=>r[0]===editId);
-    if(ai>=0) AD[ai]=vals;
-    else OV[editId]={1:name,2:vals[2],3:vals[3],4:vals[4],5:vals[5],6:vals[6],7:vals[7],8:vals[8],9:vals[9]};
-  }
-  saveL(); closeOv('ov-edit'); render();
-}
-function deleteItem(){
-  if(!confirm('이 품목을 삭제하시겠습니까?')) return;
-  const ai=AD.findIndex(r=>r[0]===editId);
-  if(ai>=0) AD.splice(ai,1);
-  else { DL.push(editId); delete OV[editId]; }
-  saveL(); closeOv('ov-edit'); closeOv('ov-detail'); render();
+  closeOv('ov-detail'); openOv('ov-edit');
 }
 
 // ── 단가 일괄조정 ──
-function openAdj(){
-  document.getElementById('adj-gen').value = GEN_MULT!==1 ? Math.round((GEN_MULT-1)*100) : '';
-  document.getElementById('adj-dis').value = DIS_MULT!==1 ? Math.round((DIS_MULT-1)*100) : '';
-  adjPreview();
-  openOv('ov-adj');
-}
-function setAdjVal(id, val){
-  document.getElementById(id).value=val;
-  adjPreview();
-}
+function openAdj(){ document.getElementById('adj-gen').value=''; document.getElementById('adj-dis').value=''; adjPreview(); openOv('ov-adj'); }
+function setAdj(id,v){ document.getElementById(id).value=v; adjPreview(); }
 function adjPreview(){
   const gp=parseFloat(document.getElementById('adj-gen').value)||0;
   const dp=parseFloat(document.getElementById('adj-dis').value)||0;
-  const s=BASE_D.find(r=>r[0]===5);
+  const s=products.find(p=>p.no===5);
   if(s){
-    const cg=Math.round(s[7]*GEN_MULT), ng=Math.round(s[7]*(1+gp/100));
-    const cd=Math.round(s[8]*DIS_MULT), nd=Math.round(s[8]*(1+dp/100));
-    document.getElementById('adj-gen-prev').textContent=
-      gp!==0 ? `예시) 화과자2구 상: ${cg.toLocaleString()}원 → ${ng.toLocaleString()}원` : '';
-    document.getElementById('adj-dis-prev').textContent=
-      dp!==0 ? `예시) 화과자2구 상: ${cd.toLocaleString()}원 → ${nd.toLocaleString()}원` : '';
+    document.getElementById('adj-gen-prev').textContent=gp?`예시) 화과자2구 상: ${s.price_general.toLocaleString()}원 → ${Math.round(s.price_general*(1+gp/100)).toLocaleString()}원`:'';
+    document.getElementById('adj-dis-prev').textContent=dp?`예시) 화과자2구 상: ${s.price_dist.toLocaleString()}원 → ${Math.round(s.price_dist*(1+dp/100)).toLocaleString()}원`:'';
   }
 }
-function applyAdj(){
+async function applyAdj(){
   const gp=parseFloat(document.getElementById('adj-gen').value)||0;
   const dp=parseFloat(document.getElementById('adj-dis').value)||0;
-  if(gp===0&&dp===0){ alert('퍼센트를 입력하세요.'); return; }
-  if(!confirm(`전체 ${BASE_D.length}개 품목에 적용합니다.\n일반단가: ${gp>0?'+':''}${gp}%\n유통단가: ${dp>0?'+':''}${dp}%\n\n계속하시겠습니까?`)) return;
-  GEN_MULT = 1+gp/100;
-  DIS_MULT = 1+dp/100;
-  localStorage.setItem('shp_gen_mult', GEN_MULT.toString());
-  localStorage.setItem('shp_dis_mult', DIS_MULT.toString());
-  closeOv('ov-adj');
+  if(gp===0&&dp===0){alert('퍼센트를 입력하세요.');return;}
+  if(!confirm(`전체 ${products.length}개 품목에 적용합니다.\n일반단가: ${gp>0?'+':''}${gp}%\n유통단가: ${dp>0?'+':''}${dp}%\n\n⚠ DB에 영구 반영됩니다. 계속하시겠습니까?`)) return;
+  const btn=document.getElementById('adj-apply-btn'); btn.textContent='적용 중…';
+  const updates=products.map(p=>({id:p.id,no:p.no,name:p.name,material:p.material,thickness:p.thickness,feed_width:p.feed_width,transfer:p.transfer,mold_count:p.mold_count,box_qty:p.box_qty,price_general:Math.round(p.price_general*(1+gp/100)),price_dist:Math.round(p.price_dist*(1+dp/100))}));
+  const {error}=await sb.from('products').upsert(updates);
+  btn.textContent='전체 적용 (DB 영구 반영)';
+  if(error){alert('오류: '+error.message);return;}
+  await sb.from('notices').insert({type:'update',product_name:'전체 품목',message:`전체 단가가 조정되었습니다 (일반${gp>0?'+':''}${gp}% / 유통${dp>0?'+':''}${dp}%)`,created_by:CU.id});
+  closeOv('ov-adj'); await loadProducts(); alert('✓ 적용 완료!');
+}
+
+// ── 원재료 단가 ──
+function toggleMat(){ const p=document.getElementById('mat-panel'),b=document.getElementById('mat-toggle'); const o=p.classList.toggle('open'); b.classList.toggle('open',o); }
+function updateMP(){
+  MP={PET:+document.getElementById('mp-pet').value||2100,'PET금색':+document.getElementById('mp-petg').value||4000,PS:+document.getElementById('mp-ps').value||2500,'PS금색':+document.getElementById('mp-psg').value||4300,PP:+document.getElementById('mp-pp').value||2600};
   render();
-  alert(`✓ 적용 완료!\n일반단가 ${gp>0?'+':''}${gp}% / 유통단가 ${dp>0?'+':''}${dp}%`);
 }
-function resetAdj(){
-  if(!confirm('단가를 원래 값으로 되돌리시겠습니까?')) return;
-  GEN_MULT=1; DIS_MULT=1;
-  localStorage.removeItem('shp_gen_mult');
-  localStorage.removeItem('shp_dis_mult');
-  document.getElementById('adj-gen').value='';
-  document.getElementById('adj-dis').value='';
-  adjPreview();
-  render();
-  alert('✓ 원래 단가로 복원됐습니다.');
-}
-
-// ── 메모 ──
-function checkDot(){
-  document.getElementById('memo-dot').classList.toggle('on',(localStorage.getItem('shp_memo')||'').trim().length>0);
-}
-function openMemo(){
-  document.getElementById('memo-ta').value=localStorage.getItem('shp_memo')||'';
-  const d=localStorage.getItem('shp_memo_date')||'';
-  document.getElementById('memo-date').textContent=d?`마지막 수정: ${d}`:'';
-  document.getElementById('memo-ok').style.display='none';
-  openOv('ov-memo');
-  setTimeout(()=>document.getElementById('memo-ta').focus(),300);
-}
-function saveMemo(){
-  const now=new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-  localStorage.setItem('shp_memo',document.getElementById('memo-ta').value);
-  localStorage.setItem('shp_memo_date',now);
-  document.getElementById('memo-date').textContent=`마지막 수정: ${now}`;
-  const el=document.getElementById('memo-ok'); el.style.display='block';
-  setTimeout(()=>{el.style.display='none';},2000);
-  checkDot();
-}
-
-// ── 내보내기 ──
-function openExport(){
-  const ok=Object.keys(OV), total=ok.length+AD.length+DL.length;
-  if(!total){ alert('수정한 내용이 없습니다.'); return; }
-  let lines=[`=== 새한패키지 단가표 수정사항 ===`,`날짜: ${new Date().toLocaleString('ko-KR')}`,`총 ${total}건 (수정 ${ok.length}·추가 ${AD.length}·삭제 ${DL.length})`,``];
-  if(ok.length){
-    lines.push('[ 수정 ]');
-    ok.forEach(id=>{
-      const orig=BASE_D.find(r=>r[0]==id), ov=OV[id];
-      lines.push(`NO.${id} ${orig?orig[1]:'?'}`);
-      const f={1:'품명',2:'소재',3:'두께',4:'원단폭',5:'이송',6:'몰드수',7:'일반단가',8:'유통단가',9:'입수량'};
-      Object.keys(ov).forEach(k=>{if(orig&&orig[k]!=ov[k])lines.push(`  ${f[k]}: ${orig[k]} → ${ov[k]}`);});
-    });
-    lines.push('');
-  }
-  if(AD.length){ lines.push('[ 추가 ]'); AD.forEach(r=>lines.push(`NO.${r[0]} ${r[1]} / 소재:${r[2]} / 두께:${r[3]} / 원단폭:${r[4]} / 이송:${r[5]} / 몰드수:${r[6]} / 일반단가:${r[7]}원 / 유통단가:${r[8]}원 / 입수량:${r[9]||0}`)); lines.push(''); }
-  if(DL.length){ lines.push('[ 삭제 ]'); DL.forEach(id=>{const o=BASE_D.find(r=>r[0]==id);lines.push(`NO.${id} ${o?o[1]:'?'}`);});lines.push(''); }
-  lines.push('=== Claude에게 이 내용을 붙여넣기 하세요 ===');
-  document.getElementById('export-ta').value=lines.join('\n');
-  document.getElementById('export-info').textContent=`수정 ${ok.length}건·추가 ${AD.length}건·삭제 ${DL.length}건 — 복사 후 Claude에게 붙여넣으면 GitHub에 영구 반영됩니다`;
-  openOv('ov-export');
-}
-function copyExport(){
-  navigator.clipboard.writeText(document.getElementById('export-ta').value).then(()=>{
-    const b=document.querySelector('.copy-btn'); b.textContent='✓ 복사 완료!';
-    setTimeout(()=>{b.textContent='📋 클립보드에 복사';},2200);
-  }).catch(()=>{document.getElementById('export-ta').select();document.execCommand('copy');});
-}
-
-// ── 오버레이 ──
-function openOv(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeOv(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-
 
 // ── 엑셀 다운로드 ──
 function downloadExcel(){
-  const d = getD();
-  const headers = ['NO','품명','소재','두께(mm)','원단폭(mm)','이송(mm)','몰드수(개/판)','일반단가(원)','유통단가(원)','박스입수량(개)','개당중량(g)','원단가(원)'];
-  const rows = d.map(r => {
-    const w = calcWeight(r);
-    const c = calcCost(r);
-    return [
-      r[0], r[1], r[2],
-      r[3]||'', r[4]||'', r[5]||'', r[6]||'',
-      r[7]||'', r[8]||'',
-      r[9]||'',
-      w!==null ? w : '',
-      c!==null ? c : ''
-    ];
-  });
-  const BOM = '﻿';
-  const csvContent = BOM + [headers, ...rows].map(row =>
-    row.map(v => (typeof v === 'string' && v.includes(',')) ? `"${v}"` : v).join(',')
-  ).join('\n');
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  a.href = url;
-  a.download = `새한패키지_단가표_${dateStr}.csv`;
+  const headers=['NO','품명','소재','두께(mm)','원단폭(mm)','이송(mm)','몰드수(개/판)','일반단가(원)','유통단가(원)','박스입수량(개)','개당중량(g)','원단가(원)'];
+  const rows=products.map(p=>{const w=calcWeight(p),c=calcCost(p);return[p.no,p.name,p.material,p.thickness||'',p.feed_width||'',p.transfer||'',p.mold_count||'',p.price_general||'',p.price_dist||'',p.box_qty||'',w??'',c??''];});
+  const csv='﻿'+[headers,...rows].map(r=>r.map(v=>(typeof v==='string'&&v.includes(','))?`"${v}"`:v).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`새한패키지_단가표_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`;
   a.click();
-  URL.revokeObjectURL(url);
 }
 
-// ── 서비스워커 ──
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+// ── 데이터 마이그레이션 (최초 1회) ──
+async function migrateData(){
+  if(!confirm(`기존 데이터 ${MIGRATE_DATA.length}개를 Supabase에 등록합니다.\n최초 1회만 실행하세요.`)) return;
+  const rows=MIGRATE_DATA.map(r=>({no:r[0],name:r[1],material:r[2],thickness:r[3],feed_width:r[4],transfer:r[5],mold_count:r[6],price_general:r[7],price_dist:r[8],box_qty:r[9]||0}));
+  const {error}=await sb.from('products').insert(rows);
+  if(error){alert('오류: '+error.message);return;}
+  alert(`✓ ${rows.length}개 제품 등록 완료!`);
+  await loadProducts();
+}
+
+// ── 오버레이 ──
+function openOv(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeOv(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 
 // ── 이벤트 ──
 document.getElementById('search').addEventListener('input',e=>{sQ=e.target.value.trim().toLowerCase();render();});
 document.getElementById('sort').addEventListener('change',e=>{sKey=e.target.value;render();});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
-// ── 초기화 ──
+// ── 시작 ──
 initAuth();
 </script>
 </body>
