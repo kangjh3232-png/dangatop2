@@ -633,12 +633,19 @@ function hideLoading(){ document.getElementById('loading-screen').classList.remo
 // ── AUTH ──
 async function initAuth(){
   showLoading();
-  const {data:{session}} = await sb.auth.getSession();
-  if(session?.user){ await checkAccess(session.user); }
-  else { hideLoading(); document.getElementById('login-screen').classList.add('show'); }
+  // onAuthStateChange를 먼저 등록 (PKCE 콜백 이벤트를 놓치지 않기 위해)
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session){ await checkAccess(session.user); }
-    else if(event==='SIGNED_OUT'){ CU=null; document.getElementById('app-root').style.display='none'; document.getElementById('login-screen').classList.add('show'); }
+    console.log('[Auth]', event, session?.user?.email);
+    if((event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='TOKEN_REFRESHED')&&session?.user){
+      if(!CU) await checkAccess(session.user);  // 이미 처리됐으면 중복 방지
+    } else if(event==='INITIAL_SESSION'&&!session){
+      hideLoading();
+      document.getElementById('login-screen').classList.add('show');
+    } else if(event==='SIGNED_OUT'){
+      CU=null;
+      document.getElementById('app-root').style.display='none';
+      document.getElementById('login-screen').classList.add('show');
+    }
   });
 }
 
@@ -922,7 +929,7 @@ function render(){
   document.getElementById('no-res').style.display='none';
   document.getElementById('list').innerHTML=d.map(p=>{
     const c=calcCost(p);
-    return `<div class="item-card" onclick="showD('${p.id}')">
+    return `<div class="item-card" onclick="showD(${p.id})">
       <div class="item-no">${p.no}</div>
       <div class="item-body">
         <div class="item-name">${escHtml(p.name)}</div>
@@ -938,10 +945,10 @@ function render(){
 
 // ── 상세 ──
 function showD(id){
-  const p=products.find(x=>x.id===id); if(!p) return;
+  const p=products.find(x=>x.id==id); if(!p) return;
   document.getElementById('d-nm').textContent=p.name;
   const editBtn=document.getElementById('d-bd');
-  editBtn.innerHTML=bdg(p.material)+(CU?.role==='admin'?`<button class="d-edit-btn show" onclick="openEdit('${id}')">수정</button>`:'');
+  editBtn.innerHTML=bdg(p.material)+(CU?.role==='admin'?`<button class="d-edit-btn show" onclick="openEdit(${p.id})">수정</button>`:'');
   const c=calcCost(p),proc=calcProc(p),procD=calcProcDist(p),w=calcWeight(p);
   const dc=p.price_general>0&&p.price_dist>0?Math.round((1-p.price_dist/p.price_general)*100):0;
   let h='';
@@ -974,7 +981,7 @@ function openEdit(id){
     ['ef-name','ef-thick','ef-feed','ef-width','ef-mold','ef-box','ef-gen','ef-dist'].forEach(i=>document.getElementById(i).value='');
     document.getElementById('ef-mat').value='PET';
   } else {
-    const p=products.find(x=>x.id===id); if(!p) return;
+    const p=products.find(x=>x.id==id); if(!p) return;
     document.getElementById('ef-name').value=p.name;
     document.getElementById('ef-mat').value=p.material;
     document.getElementById('ef-thick').value=p.thickness||'';
