@@ -485,6 +485,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
 // ══════════════════════════════════════
 //  ⚙ Supabase 설정
@@ -953,13 +954,38 @@ async function saveMaterialPrices(){
 }
 
 // ── 엑셀 다운로드 ──
-function downloadExcel(){
-  const headers=['NO','품명','소재','두께(mm)','원단폭(mm)','이송(mm)','몰드수(개/판)','일반단가(원)','유통단가(원)','박스입수량(개)','개당중량(g)','원단가(원)'];
-  const rows=products.map(p=>{const w=calcWeight(p),c=calcCost(p);return[p.no,p.name,p.material,p.thickness||'',p.feed_width||'',p.transfer||'',p.mold_count||'',p.price_general||'',p.price_dist||'',p.box_qty||'',w??'',c??''];});
-  const csv='﻿'+[headers,...rows].map(r=>r.map(v=>(typeof v==='string'&&v.includes(','))?`"${v}"`:v).join(',')).join('\n');
+async function downloadExcel(){
+  const headers=['NO','품명','소재','두께(mm)','원단폭(mm)','이송(mm)','몰드수(개/판)','일반단가(원)','일반 판당가공비(원)','유통단가(원)','유통 판당가공비(원)','박스입수량(개)','개당중량(g)','원단가(원)'];
+  const YELLOW='FFFFF176', BLUE='FF90CAF9'; // 500원 이상=노랑, 300원 미만=파랑
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet('단가표');
+  const headerRow=ws.addRow(headers);
+  headerRow.font={bold:true};
+  headerRow.eachCell(c=>{c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE5E7EB'}};c.alignment={horizontal:'center'};});
+
+  products.forEach(p=>{
+    const w=calcWeight(p),c=calcCost(p),proc=calcProc(p),procD=calcProcDist(p);
+    const row=ws.addRow([p.no,p.name,p.material,p.thickness||'',p.feed_width||'',p.transfer||'',p.mold_count||'',p.price_general||'',proc??'',p.price_dist||'',procD??'',p.box_qty||'',w??'',c??'']);
+    const procCell=row.getCell(9), procDCell=row.getCell(11);
+    if(proc!==null){
+      if(proc>=500) procCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:YELLOW}};
+      else if(proc<300) procCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:BLUE}};
+    }
+    if(procD!==null){
+      if(procD>=500) procDCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:YELLOW}};
+      else if(procD<300) procDCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:BLUE}};
+    }
+  });
+
+  ws.columns.forEach((col,i)=>{ col.width = i===1?20:14; });
+  ws.getColumn(8).numFmt='#,##0'; ws.getColumn(9).numFmt='#,##0';
+  ws.getColumn(10).numFmt='#,##0'; ws.getColumn(11).numFmt='#,##0';
+  ws.getColumn(14).numFmt='#,##0';
+
+  const buf=await wb.xlsx.writeBuffer();
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download=`새한패키지_단가표_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.csv`;
+  a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  a.download=`새한패키지_단가표_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.xlsx`;
   a.click();
 }
 
