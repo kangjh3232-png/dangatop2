@@ -385,21 +385,34 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
     <div class="ef">
       <div class="fg"><label>품명 *</label><input class="fi" id="ef-name" placeholder="예) 화과자4구 상"></div>
       <div class="fg-row">
-        <div class="fg"><label>소재</label><select class="fi" id="ef-mat"><option value="투명PET">투명PET</option><option value="흑색PET">흑색PET</option><option value="PET금색">PET금색</option><option value="PS">PS</option><option value="PS금색">PS금색</option><option value="PP">PP</option><option value="사출">사출</option></select></div>
-        <div class="fg"><label>몰드홈 수량</label><input class="fi" id="ef-mold" type="number" min="0" placeholder="18"></div>
+        <div class="fg"><label>소재</label><select class="fi" id="ef-mat" onchange="efRecalcFromPrice()"><option value="투명PET">투명PET</option><option value="흑색PET">흑색PET</option><option value="PET금색">PET금색</option><option value="PS">PS</option><option value="PS금색">PS금색</option><option value="PP">PP</option><option value="사출">사출</option></select></div>
+        <div class="fg"><label>몰드홈 수량</label><input class="fi" id="ef-mold" type="number" min="0" placeholder="18" oninput="efRecalcFromPrice()"></div>
       </div>
       <div class="fg-row">
-        <div class="fg"><label>두께 (mm)</label><input class="fi" id="ef-thick" type="number" step="0.01" placeholder="0.43"></div>
-        <div class="fg"><label>원단폭 (mm)</label><input class="fi" id="ef-feed" type="number" placeholder="540"></div>
+        <div class="fg"><label>두께 (mm)</label><input class="fi" id="ef-thick" type="number" step="0.01" placeholder="0.43" oninput="efRecalcFromPrice()"></div>
+        <div class="fg"><label>원단폭 (mm)</label><input class="fi" id="ef-feed" type="number" placeholder="540" oninput="efRecalcFromPrice()"></div>
       </div>
       <div class="fg-row">
-        <div class="fg"><label>이송 (mm)</label><input class="fi" id="ef-width" type="number" placeholder="266"></div>
+        <div class="fg"><label>이송 (mm)</label><input class="fi" id="ef-width" type="number" placeholder="266" oninput="efRecalcFromPrice()"></div>
         <div class="fg"><label>박스 입수량</label><input class="fi" id="ef-box" type="number" min="0" placeholder="1200"></div>
       </div>
       <div class="fg-row">
-        <div class="fg"><label>일반단가 (원)</label><input class="fi" id="ef-gen" type="number" placeholder="0"></div>
-        <div class="fg"><label>유통단가 (원)</label><input class="fi" id="ef-dist" type="number" placeholder="0"></div>
+        <div class="fg"><label>일반단가 (원)</label><input class="fi" id="ef-gen" type="number" placeholder="0" oninput="efRecalcFromPrice()"></div>
+        <div class="fg"><label>유통단가 (원)</label><input class="fi" id="ef-dist" type="number" placeholder="0" oninput="efRecalcFromPrice()"></div>
       </div>
+
+      <div class="fg" style="background:var(--bg);border:1.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;margin-top:2px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:700;color:var(--txt2)">🧮 가공비 미리보기</span>
+          <span id="ef-unitcost" style="font-size:11px;font-weight:700;color:var(--txt3)">원단가: —</span>
+        </div>
+        <div class="fg-row">
+          <div class="fg" style="margin-bottom:0"><label>일반 판당가공비 (원)</label><input class="fi" id="ef-proc-gen" type="number" placeholder="0" oninput="onProcInput('gen')"></div>
+          <div class="fg" style="margin-bottom:0"><label>유통 판당가공비 (원)</label><input class="fi" id="ef-proc-dist" type="number" placeholder="0" oninput="onProcInput('dist')"></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--txt3);line-height:1.5;margin-top:8px">규격(두께·원단폭·이송·몰드수) 입력 시 원단가가 자동 계산됩니다.<br>단가를 입력하면 판당가공비가, 판당가공비를 입력하면 단가가 자동으로 채워집니다. (저장 전 미리보기이며 저장 버튼을 눌러야 반영됩니다)</div>
+      </div>
+
       <button class="del-btn" id="ef-del" onclick="deleteItem()" style="display:none">🗑 이 품목 삭제</button>
     </div>
   </div>
@@ -897,7 +910,50 @@ function openEdit(id){
     document.getElementById('ef-gen').value=p.price_general||'';
     document.getElementById('ef-dist').value=p.price_dist||'';
   }
+  efRecalcFromPrice();
   closeOv('ov-detail'); openOv('ov-edit');
+}
+
+// ── 가공비 미리보기 계산기 (수정폼) ──
+function efUnitCost(){
+  const mat=document.getElementById('ef-mat').value;
+  const thick=parseFloat(document.getElementById('ef-thick').value)||0;
+  const feed=parseFloat(document.getElementById('ef-feed').value)||0;
+  const tr=parseFloat(document.getElementById('ef-width').value)||0;
+  const mold=parseFloat(document.getElementById('ef-mold').value)||0;
+  if(!thick||!feed||!tr||!mold) return null;
+  return Math.round(thick*feed*tr*(DENSITY[mat]||1.34)/1000000*(MP[mat]||MP['투명PET'])/mold);
+}
+// 규격/단가 입력 시 → 원단가 · 판당가공비 미리보기 갱신
+function efRecalcFromPrice(){
+  const c=efUnitCost();
+  const mold=parseFloat(document.getElementById('ef-mold').value)||0;
+  const gen=document.getElementById('ef-gen').value;
+  const dist=document.getElementById('ef-dist').value;
+  const ucEl=document.getElementById('ef-unitcost');
+  if(c===null){
+    ucEl.textContent='원단가: 규격을 입력하세요';
+    document.getElementById('ef-proc-gen').value='';
+    document.getElementById('ef-proc-dist').value='';
+    return;
+  }
+  ucEl.textContent=`원단가: ${c.toLocaleString()}원/개`;
+  document.getElementById('ef-proc-gen').value=(mold&&gen!=='')?Math.round((parseFloat(gen)-c)*mold):'';
+  document.getElementById('ef-proc-dist').value=(mold&&dist!=='')?Math.round((parseFloat(dist)-c)*mold):'';
+}
+// 판당가공비 입력 시 → 역산하여 단가 미리보기 채움
+function onProcInput(kind){
+  const c=efUnitCost();
+  const mold=parseFloat(document.getElementById('ef-mold').value)||0;
+  const procEl=document.getElementById(kind==='gen'?'ef-proc-gen':'ef-proc-dist');
+  const priceEl=document.getElementById(kind==='gen'?'ef-gen':'ef-dist');
+  const proc=procEl.value;
+  if(c===null||!mold){
+    document.getElementById('ef-unitcost').textContent='원단가: 규격을 입력하세요';
+    return;
+  }
+  if(proc===''){ priceEl.value=''; return; }
+  priceEl.value=Math.round(c+parseFloat(proc)/mold);
 }
 
 // ── 단가 일괄조정 ──
