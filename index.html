@@ -89,6 +89,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .badge{display:inline-flex;align-items:center;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0}
 .b-pet{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-bdr)}
 .b-petb{background:#1f2937;color:#f3f4f6;border:1px solid #4b5563}
+.b-petw{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
 .b-petg{background:var(--amber-bg);color:var(--amber);border:1px solid #fcd34d}
 .b-ps{background:var(--bg);color:var(--txt2);border:1px solid var(--bdr2)}
 .b-psg{background:var(--amber-bg);color:var(--amber);border:1px solid #fcd34d}
@@ -317,9 +318,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
       <div class="mat-row">
         <div class="mat-item"><span class="mat-label">투명PET</span><input class="mat-input" id="mp-pet-t" type="number" value="2100" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
         <div class="mat-item"><span class="mat-label">흑색PET</span><input class="mat-input" id="mp-pet-b" type="number" value="2100" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
-        <div class="mat-item"><span class="mat-label">PET금색</span><input class="mat-input" id="mp-petg" type="number" value="4000" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
+        <div class="mat-item"><span class="mat-label">백색PET</span><input class="mat-input" id="mp-pet-w" type="number" value="2100" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
       </div>
       <div class="mat-row">
+        <div class="mat-item"><span class="mat-label">PET금색</span><input class="mat-input" id="mp-petg" type="number" value="4000" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
         <div class="mat-item"><span class="mat-label">PS</span><input class="mat-input" id="mp-ps" type="number" value="2500" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
         <div class="mat-item"><span class="mat-label">PS금색</span><input class="mat-input" id="mp-psg" type="number" value="4300" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
         <div class="mat-item"><span class="mat-label">PP</span><input class="mat-input" id="mp-pp" type="number" value="2600" min="0" step="10" oninput="updateMP()"><span class="mat-unit">원/kg</span></div>
@@ -385,7 +387,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
     <div class="ef">
       <div class="fg"><label>품명 *</label><input class="fi" id="ef-name" placeholder="예) 화과자4구 상"></div>
       <div class="fg-row">
-        <div class="fg"><label>소재</label><select class="fi" id="ef-mat" onchange="efRecalcFromPrice()"><option value="투명PET">투명PET</option><option value="흑색PET">흑색PET</option><option value="PET금색">PET금색</option><option value="PS">PS</option><option value="PS금색">PS금색</option><option value="PP">PP</option><option value="사출">사출</option></select></div>
+        <div class="fg"><label>소재</label><select class="fi" id="ef-mat" onchange="efRecalcFromPrice()"><option value="투명PET">투명PET</option><option value="흑색PET">흑색PET</option><option value="백색PET">백색PET</option><option value="PET금색">PET금색</option><option value="PS">PS</option><option value="PS금색">PS금색</option><option value="PP">PP</option><option value="사출">사출</option></select></div>
         <div class="fg"><label>몰드홈 수량</label><input class="fi" id="ef-mold" type="number" min="0" placeholder="18" oninput="efRecalcFromPrice()"></div>
       </div>
       <div class="fg-row">
@@ -414,6 +416,43 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
       </div>
 
       <button class="del-btn" id="ef-del" onclick="deleteItem()" style="display:none">🗑 이 품목 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 가공비 미리보기 계산기 (읽기전용, DB 저장 안 됨) -->
+<div class="ov" id="ov-calc" onclick="if(event.target===this)closeOv('ov-calc')">
+  <div class="sheet scroll">
+    <div class="drag-bar"></div>
+    <div class="sh-head"><span class="sh-title">🧮 가공비 미리보기</span><button class="sh-btn ghost" onclick="closeOv('ov-calc')">닫기</button></div>
+    <div style="padding:10px 20px 0;font-size:11.5px;color:var(--txt3);line-height:1.6">여기서 값을 바꿔도 저장되지 않습니다. 안전하게 계산만 확인하는 화면입니다.</div>
+    <div class="ef">
+      <div class="fg-row">
+        <div class="fg"><label>소재</label><select class="fi" id="calc-mat" onchange="calcRecalc()"><option value="투명PET">투명PET</option><option value="흑색PET">흑색PET</option><option value="백색PET">백색PET</option><option value="PET금색">PET금색</option><option value="PS">PS</option><option value="PS금색">PS금색</option><option value="PP">PP</option><option value="사출">사출</option></select></div>
+        <div class="fg"><label>몰드홈 수량</label><input class="fi" id="calc-mold" type="number" min="0" placeholder="18" oninput="calcRecalc()"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>두께 (mm)</label><input class="fi" id="calc-thick" type="number" step="0.01" placeholder="0.43" oninput="calcRecalc()"></div>
+        <div class="fg"><label>원단폭 (mm)</label><input class="fi" id="calc-feed" type="number" placeholder="540" oninput="calcRecalc()"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>이송 (mm)</label><input class="fi" id="calc-width" type="number" placeholder="266" oninput="calcRecalc()"></div>
+        <div class="fg"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>일반단가 (원)</label><input class="fi" id="calc-gen" type="number" placeholder="0" oninput="calcOnPrice('gen')"></div>
+        <div class="fg"><label>유통단가 (원)</label><input class="fi" id="calc-dist" type="number" placeholder="0" oninput="calcOnPrice('dist')"></div>
+      </div>
+      <div class="fg" style="background:var(--bg);border:1.5px solid var(--bdr);border-radius:var(--rad);padding:12px 14px;margin-bottom:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:11px;font-weight:700;color:var(--txt2)">계산 결과</span>
+          <span id="calc-unitcost" style="font-size:11px;font-weight:700;color:var(--txt3)">원단가: —</span>
+        </div>
+        <div class="fg-row">
+          <div class="fg" style="margin-bottom:0"><label>일반 판당가공비 (원)</label><input class="fi" id="calc-proc-gen" type="number" placeholder="0" oninput="calcOnProc('gen')"></div>
+          <div class="fg" style="margin-bottom:0"><label>유통 판당가공비 (원)</label><input class="fi" id="calc-proc-dist" type="number" placeholder="0" oninput="calcOnProc('dist')"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -511,7 +550,7 @@ const REDIRECT_URL  = 'https://kangjh3232-png.github.io/dangatop2/';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── 상수 ──
-const DENSITY = {'투명PET':1.34,'흑색PET':1.34,'PET금색':1.34,'PS':1.05,'PS금색':1.05,'PP':0.93};
+const DENSITY = {'투명PET':1.34,'흑색PET':1.34,'백색PET':1.34,'PET금색':1.34,'PS':1.05,'PS금색':1.05,'PP':0.93};
 const CATS = [{l:'전체',k:'all'},{l:'화과자',k:'화과자'},{l:'SH-18x',k:'SH-1'},{l:'SH-B',k:'SH-B'},{l:'SH-C',k:'SH-C'},{l:'SH-R',k:'SH-R'},{l:'SH-S/T',k:'SH-S|SH-T'},{l:'마카롱',k:'마카롱'},{l:'뚱카롱',k:'뚱카롱'},{l:'떡케익',k:'떡케익'},{l:'기타',k:'기타'}];
 
 // ── 상태 ──
@@ -520,7 +559,7 @@ let products = [];       // Supabase 제품 목록
 let memos = [];          // Supabase 공유 메모
 let unreadNotices = [];  // 읽지 않은 공지
 let allNotices = [];     // 전체 공지
-let MP = {'투명PET':2100,'흑색PET':2100,'PET금색':4000,PS:2500,'PS금색':4300,PP:2600};
+let MP = {'투명PET':2100,'흑색PET':2100,'백색PET':2100,'PET금색':4000,PS:2500,'PS금색':4300,PP:2600};
 let aTag='all', sKey='', sQ='', editId=null;
 
 // ── 유틸 ──
@@ -617,7 +656,7 @@ function applyRole(){
   });
   if(isAdmin) document.getElementById('fab').classList.add('show');
   // 비관리자는 원재료 단가 입력 비활성화
-  ['mp-pet-t','mp-pet-b','mp-petg','mp-ps','mp-psg','mp-pp'].forEach(id=>{
+  ['mp-pet-t','mp-pet-b','mp-pet-w','mp-petg','mp-ps','mp-psg','mp-pp'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.readOnly=!isAdmin;
   });
@@ -810,7 +849,7 @@ function calcWeight(p){
 
 // ── 렌더 ──
 function bdg(m){
-  const map={'투명PET':'<span class="badge b-pet">투명</span>','흑색PET':'<span class="badge b-petb">흑색</span>','PET금색':'<span class="badge b-petg">PET금</span>','PS':'<span class="badge b-ps">PS</span>','PS금색':'<span class="badge b-psg">PS금</span>','PP':'<span class="badge b-pp">PP</span>','사출':'<span class="badge b-etc">사출</span>'};
+  const map={'투명PET':'<span class="badge b-pet">투명</span>','흑색PET':'<span class="badge b-petb">흑색</span>','백색PET':'<span class="badge b-petw">백색</span>','PET금색':'<span class="badge b-petg">PET금</span>','PS':'<span class="badge b-ps">PS</span>','PS금색':'<span class="badge b-psg">PS금</span>','PP':'<span class="badge b-pp">PP</span>','사출':'<span class="badge b-etc">사출</span>'};
   return map[m]||map['투명PET'];
 }
 function mc(name,k){
@@ -866,7 +905,7 @@ function showD(id){
   const p=products.find(x=>x.id==id); if(!p) return;
   document.getElementById('d-nm').textContent=p.name;
   const editBtn=document.getElementById('d-bd');
-  editBtn.innerHTML=bdg(p.material)+(CU?.role==='admin'?`<button class="d-edit-btn show" onclick="openEdit(${p.id})">수정</button>`:'');
+  editBtn.innerHTML=bdg(p.material)+(CU?.role==='admin'?`<button class="d-edit-btn show" style="background:var(--green-bg);color:var(--green);border-color:var(--green-bdr)" onclick="openCalc(${p.id})">🧮 미리보기</button><button class="d-edit-btn show" onclick="openEdit(${p.id})">수정</button>`:'');
   const c=calcCost(p),proc=calcProc(p),procD=calcProcDist(p),w=calcWeight(p);
   const dc=p.price_general>0&&p.price_dist>0?Math.round((1-p.price_dist/p.price_general)*100):0;
   let h='';
@@ -956,6 +995,62 @@ function onProcInput(kind){
   priceEl.value=Math.round(c+parseFloat(proc)/mold);
 }
 
+// ── 가공비 미리보기 계산기 (독립 화면, 수정폼 진입 없이 확인용 · 저장 없음) ──
+function openCalc(id){
+  const p=id!=null?products.find(x=>x.id==id):null;
+  document.getElementById('calc-mat').value=p?p.material:'투명PET';
+  document.getElementById('calc-mold').value=p?(p.mold_count||''):'';
+  document.getElementById('calc-thick').value=p?(p.thickness||''):'';
+  document.getElementById('calc-feed').value=p?(p.feed_width||''):'';
+  document.getElementById('calc-width').value=p?(p.transfer||''):'';
+  document.getElementById('calc-gen').value=p?(p.price_general||''):'';
+  document.getElementById('calc-dist').value=p?(p.price_dist||''):'';
+  calcRecalc();
+  openOv('ov-calc');
+}
+function calcUnitCost(){
+  const mat=document.getElementById('calc-mat').value;
+  const thick=parseFloat(document.getElementById('calc-thick').value)||0;
+  const feed=parseFloat(document.getElementById('calc-feed').value)||0;
+  const tr=parseFloat(document.getElementById('calc-width').value)||0;
+  const mold=parseFloat(document.getElementById('calc-mold').value)||0;
+  if(!thick||!feed||!tr||!mold) return null;
+  return Math.round(thick*feed*tr*(DENSITY[mat]||1.34)/1000000*(MP[mat]||MP['투명PET'])/mold);
+}
+// 규격/단가 변경 시 → 원단가 · 판당가공비 미리보기 갱신
+function calcRecalc(){
+  const c=calcUnitCost();
+  const mold=parseFloat(document.getElementById('calc-mold').value)||0;
+  const gen=document.getElementById('calc-gen').value;
+  const dist=document.getElementById('calc-dist').value;
+  const ucEl=document.getElementById('calc-unitcost');
+  if(c===null){
+    ucEl.textContent='원단가: 규격을 입력하세요';
+    document.getElementById('calc-proc-gen').value='';
+    document.getElementById('calc-proc-dist').value='';
+    return;
+  }
+  ucEl.textContent=`원단가: ${c.toLocaleString()}원/개`;
+  document.getElementById('calc-proc-gen').value=(mold&&gen!=='')?Math.round((parseFloat(gen)-c)*mold):'';
+  document.getElementById('calc-proc-dist').value=(mold&&dist!=='')?Math.round((parseFloat(dist)-c)*mold):'';
+}
+// 단가 입력 시 → 판당가공비 미리보기 갱신
+function calcOnPrice(kind){ calcRecalc(); }
+// 판당가공비 입력 시 → 역산하여 단가 미리보기 채움
+function calcOnProc(kind){
+  const c=calcUnitCost();
+  const mold=parseFloat(document.getElementById('calc-mold').value)||0;
+  const procEl=document.getElementById(kind==='gen'?'calc-proc-gen':'calc-proc-dist');
+  const priceEl=document.getElementById(kind==='gen'?'calc-gen':'calc-dist');
+  const proc=procEl.value;
+  if(c===null||!mold){
+    document.getElementById('calc-unitcost').textContent='원단가: 규격을 입력하세요';
+    return;
+  }
+  if(proc===''){ priceEl.value=''; return; }
+  priceEl.value=Math.round(c+parseFloat(proc)/mold);
+}
+
 // ── 단가 일괄조정 ──
 function openAdj(){ document.getElementById('adj-gen').value=''; document.getElementById('adj-dis').value=''; adjPreview(); openOv('ov-adj'); }
 function setAdj(id,v){ document.getElementById(id).value=v; adjPreview(); }
@@ -985,15 +1080,17 @@ async function applyAdj(){
 // ── 원재료 단가 ──
 function toggleMat(){ const p=document.getElementById('mat-panel'),b=document.getElementById('mat-toggle'); const o=p.classList.toggle('open'); b.classList.toggle('open',o); }
 function updateMP(){
-  MP={'투명PET':+document.getElementById('mp-pet-t').value||2100,'흑색PET':+document.getElementById('mp-pet-b').value||2100,'PET금색':+document.getElementById('mp-petg').value||4000,PS:+document.getElementById('mp-ps').value||2500,'PS금색':+document.getElementById('mp-psg').value||4300,PP:+document.getElementById('mp-pp').value||2600};
+  MP={'투명PET':+document.getElementById('mp-pet-t').value||2100,'흑색PET':+document.getElementById('mp-pet-b').value||2100,'백색PET':+document.getElementById('mp-pet-w').value||2100,'PET금색':+document.getElementById('mp-petg').value||4000,PS:+document.getElementById('mp-ps').value||2500,'PS금색':+document.getElementById('mp-psg').value||4300,PP:+document.getElementById('mp-pp').value||2600};
   render();
 }
 async function loadMaterialPrices(){
   const {data}=await sb.from('material_prices').select('*').eq('id',1).single();
   if(!data) return;
-  MP={'투명PET':data.pet_transparent??data.pet,'흑색PET':data.pet_black??data.pet,'PET금색':data.pet_gold,PS:data.ps,'PS금색':data.ps_gold,PP:data.pp};
+  const petW=data.pet_white??data.pet_transparent??data.pet;
+  MP={'투명PET':data.pet_transparent??data.pet,'흑색PET':data.pet_black??data.pet,'백색PET':petW,'PET금색':data.pet_gold,PS:data.ps,'PS금색':data.ps_gold,PP:data.pp};
   document.getElementById('mp-pet-t').value=data.pet_transparent??data.pet;
   document.getElementById('mp-pet-b').value=data.pet_black??data.pet;
+  document.getElementById('mp-pet-w').value=petW;
   document.getElementById('mp-petg').value=data.pet_gold;
   document.getElementById('mp-ps').value=data.ps;
   document.getElementById('mp-psg').value=data.ps_gold;
@@ -1002,10 +1099,10 @@ async function loadMaterialPrices(){
 }
 async function saveMaterialPrices(){
   if(CU?.role!=='admin'){alert('관리자만 수정할 수 있습니다.');return;}
-  const vals={id:1,pet_transparent:+document.getElementById('mp-pet-t').value||2100,pet_black:+document.getElementById('mp-pet-b').value||2100,pet_gold:+document.getElementById('mp-petg').value||4000,ps:+document.getElementById('mp-ps').value||2500,ps_gold:+document.getElementById('mp-psg').value||4300,pp:+document.getElementById('mp-pp').value||2600,updated_by:CU.id,updated_at:new Date().toISOString()};
+  const vals={id:1,pet_transparent:+document.getElementById('mp-pet-t').value||2100,pet_black:+document.getElementById('mp-pet-b').value||2100,pet_white:+document.getElementById('mp-pet-w').value||2100,pet_gold:+document.getElementById('mp-petg').value||4000,ps:+document.getElementById('mp-ps').value||2500,ps_gold:+document.getElementById('mp-psg').value||4300,pp:+document.getElementById('mp-pp').value||2600,updated_by:CU.id,updated_at:new Date().toISOString()};
   const {error}=await sb.from('material_prices').upsert(vals);
   if(error){alert('오류: '+error.message);return;}
-  await sb.from('notices').insert({type:'update',product_name:'원재료 단가',message:`원재료 단가가 업데이트되었습니다 (투명PET ${vals.pet_transparent}원 / 흑색PET ${vals.pet_black}원 / PS ${vals.ps}원 / PP ${vals.pp}원)`,created_by:CU.id});
+  await sb.from('notices').insert({type:'update',product_name:'원재료 단가',message:`원재료 단가가 업데이트되었습니다 (투명PET ${vals.pet_transparent}원 / 흑색PET ${vals.pet_black}원 / 백색PET ${vals.pet_white}원 / PS ${vals.ps}원 / PP ${vals.pp}원)`,created_by:CU.id});
   alert('✓ 저장 완료! 모든 사용자에게 반영됩니다.');
 }
 
