@@ -193,9 +193,17 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .notice-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bdr);align-items:flex-start}
 .notice-icon{font-size:20px;flex-shrink:0;margin-top:1px}
 .notice-body{flex:1}
-.notice-msg{font-size:14px;font-weight:600;color:var(--txt);line-height:1.4}
+.notice-msg{font-size:14px;font-weight:600;color:var(--txt);line-height:1.4;white-space:pre-line}
 .notice-time{font-size:11px;color:var(--txt3);margin-top:3px}
 .notice-unread{width:8px;height:8px;background:var(--red);border-radius:50%;flex-shrink:0;margin-top:6px}
+.notice-month{border-bottom:1px solid var(--bdr)}
+.notice-month summary{display:flex;align-items:center;gap:8px;padding:12px 20px;font-size:14px;font-weight:800;color:var(--txt);background:var(--bg);cursor:pointer;list-style:none;user-select:none}
+.notice-month summary::-webkit-details-marker{display:none}
+.nm-arrow{display:inline-block;font-size:10px;color:var(--txt3);transition:transform .2s}
+.notice-month[open] .nm-arrow{transform:rotate(90deg)}
+.nm-cnt{font-size:11px;font-weight:600;color:var(--txt3)}
+.nm-new{margin-left:auto;font-size:10px;font-weight:700;color:#fff;background:var(--red);padding:2px 8px;border-radius:20px}
+.notice-month .notice-item:last-child{border-bottom:none}
 
 /* 공지 팝업 */
 #ov-notice-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end;backdrop-filter:blur(3px)}
@@ -203,7 +211,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'Noto Sa
 .notice-popup-sheet{background:var(--card);border-radius:var(--rad-xl) var(--rad-xl) 0 0;width:100%;max-width:640px;margin:0 auto;padding:0 0 max(24px,env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.32,.72,0,1)}
 .notice-popup-body{padding:16px 20px 12px}
 .notice-popup-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-bg);border:1px solid #fcd34d;padding:3px 10px;border-radius:20px;margin-bottom:10px}
-.notice-popup-msg{font-size:16px;font-weight:700;color:var(--txt);line-height:1.5;margin-bottom:6px}
+.notice-popup-msg{font-size:16px;font-weight:700;color:var(--txt);line-height:1.5;margin-bottom:6px;white-space:pre-line}
 .notice-popup-time{font-size:12px;color:var(--txt3)}
 .notice-popup-footer{padding:8px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .notice-popup-counter{font-size:12px;color:var(--txt3);font-weight:600}
@@ -691,9 +699,10 @@ async function saveEdit(){
     if(error){alert('오류: '+error.message);document.querySelector('#ov-edit .sh-btn').textContent='저장';return;}
     await createNotice('add',data);
   } else {
+    const old={...products.find(x=>x.id==editId)}; // 공지에 이전단가 표시용 (저장 전 값)
     const {data,error}=await sb.from('products').update(row).eq('id',editId).select().single();
     if(error){alert('오류: '+error.message);document.querySelector('#ov-edit .sh-btn').textContent='저장';return;}
-    await createNotice('update',data);
+    await createNotice('update',data,old);
   }
   document.querySelector('#ov-edit .sh-btn').textContent='저장';
   closeOv('ov-edit'); await loadProducts();
@@ -709,17 +718,40 @@ async function deleteItem(){
 }
 
 // ── 공지 ──
-async function createNotice(type,p){
-  const msgs={add:`${p.name} 제품이 추가되었습니다`,update:`${p.name} 제품 가격이 수정되었습니다`,delete:`${p.name} 제품이 삭제되었습니다`};
+// 수정 공지 문구: 바뀐 단가만 "이전 → 변경" 형태로 표시
+function updateNoticeMsg(p,old){
+  const won=v=>Math.round(Number(v)||0).toLocaleString()+'원';
+  const chg=[];
+  if(Number(old?.price_general||0)!==Number(p.price_general||0)) chg.push(`일반 ${won(old?.price_general)} → ${won(p.price_general)}`);
+  if(Number(old?.price_dist||0)!==Number(p.price_dist||0)) chg.push(`유통 ${won(old?.price_dist)} → ${won(p.price_dist)}`);
+  const renamed=old?.name&&old.name!==p.name?` (이전 품명: ${old.name})`:'';
+  return chg.length?`${p.name} 제품 가격이 수정되었습니다${renamed}\n${chg.join(' / ')}`:`${p.name} 제품 정보가 수정되었습니다${renamed}`;
+}
+
+async function createNotice(type,p,old){
+  const msgs={add:`${p.name} 제품이 추가되었습니다`,update:updateNoticeMsg(p,old),delete:`${p.name} 제품이 삭제되었습니다`};
   await sb.from('notices').insert({type,product_no:p.no,product_name:p.name,message:msgs[type],created_by:CU.id});
 }
 
+// Supabase는 한 번에 최대 1000건까지만 주므로 나눠서 전부 가져옴
+async function fetchAll(makeQuery){
+  const PAGE=1000; let all=[];
+  for(let from=0;;from+=PAGE){
+    const {data,error}=await makeQuery().range(from,from+PAGE-1);
+    if(error){console.error(error);break;}
+    all=all.concat(data||[]);
+    if(!data||data.length<PAGE) break;
+  }
+  return all;
+}
+
 async function loadNotices(){
-  const {data:notices}=await sb.from('notices').select('*').order('created_at',{ascending:false}).limit(50);
-  const {data:reads}=await sb.from('notice_reads').select('notice_id').eq('user_id',CU.id);
-  allNotices=notices||[];
-  const readSet=new Set((reads||[]).map(r=>r.notice_id));
-  unreadNotices=allNotices.filter(n=>!readSet.has(n.id));
+  const notices=await fetchAll(()=>sb.from('notices').select('*').order('created_at',{ascending:false}));
+  const reads=await fetchAll(()=>sb.from('notice_reads').select('notice_id').eq('user_id',CU.id));
+  allNotices=notices;
+  const readSet=new Set(reads.map(r=>r.notice_id));
+  // 팝업은 기존처럼 최근 50건 중 안 읽은 것만 (오래된 공지가 한꺼번에 뜨지 않게)
+  unreadNotices=allNotices.slice(0,50).filter(n=>!readSet.has(n.id));
   updateNoticeBadge();
   if(unreadNotices.length>0) showNoticePopup(unreadNotices[0]);
 }
@@ -749,21 +781,34 @@ async function markCurrentRead(){
 
 function openNotices(){
   const list=document.getElementById('notices-list');
-  const readIds=new Set();
-  sb.from('notice_reads').select('notice_id').eq('user_id',CU.id).then(({data})=>{
-    (data||[]).forEach(r=>readIds.add(r.notice_id));
-    list.innerHTML=allNotices.length?allNotices.map(n=>{
-      const read=readIds.has(n.id);
-      const icon=n.type==='add'?'🆕':n.type==='delete'?'🗑':'✏️';
-      return `<div class="notice-item">
-        <div class="notice-icon">${icon}</div>
-        <div class="notice-body">
-          <div class="notice-msg">${escHtml(n.message)}</div>
-          <div class="notice-time">${new Date(n.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
-        </div>
-        ${!read?'<div class="notice-unread"></div>':''}
-      </div>`;
-    }).join(''):'<div style="padding:40px;text-align:center;color:var(--txt3)">공지가 없습니다</div>';
+  fetchAll(()=>sb.from('notice_reads').select('notice_id').eq('user_id',CU.id)).then(reads=>{
+    const readIds=new Set(reads.map(r=>r.notice_id));
+    if(!allNotices.length){list.innerHTML='<div style="padding:40px;text-align:center;color:var(--txt3)">공지가 없습니다</div>';return;}
+    // 월별로 묶기 (allNotices는 최신순)
+    const groups=[];
+    allNotices.forEach(n=>{
+      const d=new Date(n.created_at), key=`${d.getFullYear()}년 ${d.getMonth()+1}월`;
+      if(!groups.length||groups[groups.length-1].key!==key) groups.push({key,items:[]});
+      groups[groups.length-1].items.push(n);
+    });
+    list.innerHTML=groups.map((g,gi)=>{
+      const unread=g.items.filter(n=>!readIds.has(n.id)).length;
+      return `<details class="notice-month"${gi===0?' open':''}>
+        <summary><span class="nm-arrow">▸</span>📁 ${g.key}<span class="nm-cnt">${g.items.length}건</span>${unread?`<span class="nm-new">${unread} 안읽음</span>`:''}</summary>
+        ${g.items.map(n=>{
+          const read=readIds.has(n.id);
+          const icon=n.type==='add'?'🆕':n.type==='delete'?'🗑':'✏️';
+          return `<div class="notice-item">
+            <div class="notice-icon">${icon}</div>
+            <div class="notice-body">
+              <div class="notice-msg">${escHtml(n.message)}</div>
+              <div class="notice-time">${new Date(n.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+            ${!read?'<div class="notice-unread"></div>':''}
+          </div>`;
+        }).join('')}
+      </details>`;
+    }).join('');
   });
   openOv('ov-notices');
 }
